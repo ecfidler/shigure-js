@@ -15,7 +15,9 @@ async function loadCommands(client) {
     const commandName = path.basename(commands[i], ".js");
     commandImports.set(commandName, require("../commands/" + commands[i]));
     const command = commandImports.get(commandName);
-    command.commandData.name = commandName;
+    if (!command.commandData.name) {
+      command.commandData.name = commandName;
+    }
     if (command.guild === "global") {
       globalCommands.push(command.commandData);
     } else {
@@ -42,11 +44,35 @@ async function loadCommands(client) {
   // holUp.push(guild.commands.set(globalCommands));
 
   // Use in prod
-  //holUp.push(client.application.commands.set(globalCommands));
+  holUp.push(client.application.commands.set(globalCommands));
 
   await Promise.all(holUp);
 
   console.info("Registered commands!");
+
+  console.info("Setting permissions...");
+
+  const holUp2 = [];
+
+  client.guilds.cache.forEach((guild) => {
+    guild.commands.cache.forEach((command) => {
+      const commandImport = commandImports.get(command.name);
+      if (commandImport.commandData.permissions) {
+        holUp2.push(command.permissions.set({permissions: commandImport.commandData.permissions}));
+      }
+    });
+  });
+
+  client.application.commands.cache.forEach((command) => {
+    const commandImport = commandImports.get(command.name);
+    if (commandImport.commandData.permissions) {
+      holUp2.push(command.permissions.set({permissions: commandImport.commandData.permissions}));
+    }
+  });
+
+  await Promise.all(holUp2);
+
+  console.info("Set permissions!");
 }
 
 function reloadCommands(client) {

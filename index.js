@@ -23,6 +23,11 @@ client.on('interactionCreate', (interaction) => {
     if (interaction.isCommand()) {
         commandManager.commandImports.get(interaction.commandName).action(client, interaction);
     }
+
+    if (interaction.isContextMenu()) {
+        // What else do I need to add here?
+        commandManager.commandImports.get(interaction.commandName).action(client, interaction);
+    }
 });
 
 // Login

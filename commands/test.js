@@ -23,7 +23,8 @@ const commandData = {
             type: "STRING",
             required: true,
         }
-    ]
+    ],
+    type : "CHAT_INPUT",
 };
 
 async function action(client, interaction) {
