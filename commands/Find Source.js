@@ -76,6 +76,10 @@ function formatSauce(payload, thumbnail) {
         }
     });
 
+    if (sauce.fields.length == 0) {
+        sauce.addField("No accurate sources found...", "Try checking on the [main website](https://saucenao.com/) in the case of an error")
+    }
+
     return sauce;
 }
 
