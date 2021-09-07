@@ -2,6 +2,7 @@ const GUILDS = {
     WHID : "173840048343482368",
     YONI : "592214628550049794",
     TEST : "543283759407955974",
+    GLOBAL : "global",
 }
 
 const CHANNELS = {
@@ -14,6 +15,7 @@ const CHANNELS = {
     FPANTRY : "688213248163709112", // fops' pantry in sauce emporium
     TPANTRY : "771774117422301215", // tbone's pantry in sauce emporium
     KITCHEN : "698708633831211078", // kitchen in sauce emporium
+    FINDER : "592225004410896405", // sauce finder in sauce emporium
 }
 
 const ROLES = {
