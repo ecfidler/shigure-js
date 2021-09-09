@@ -1,4 +1,4 @@
-const { MessageEmbed, MessageAttachment } = require("discord.js");
+const { MessageEmbed, MessageAttachment, CommandInteractionOptionResolver } = require("discord.js");
 const { CHANNELS, GUILDS, EMOJIS, ROLES } = require("../utilities/constants.js");
 const SauceNAO = require('saucenao');
 const auth = require('../auth.json');
@@ -19,7 +19,7 @@ const commandData = {
 };
 
 async function action(client, interaction) {
-    let public = ((interaction.channel.id == CHANNELS.FINDER) || (interaction.guild.id != GUILDS.YONI));
+    let public = !((interaction.channel.id == CHANNELS.FINDER) || (interaction.guild.id != GUILDS.YONI));
     let msg = await interaction.channel.messages.fetch(interaction.targetId)
     let attch = msg.attachments;
 
@@ -66,12 +66,32 @@ function formatSauce(payload, thumbnail) {
                 sauce.addField(title, content);
     
             }
-            if (idx == 9) { // Danbooru
+
+            if (idx == 41)  { // Twitter
                 // ...
             }
-    
-            if (idx == 41)  { // Twitter
-                // ..
+
+            if (idx == 9) { // Danbooru
+                let title = "Boorus";
+                let content = "";
+
+                if (result.data?.creator) {
+                    content += `Creator: ${result.data.creator}\n`;
+                }
+                if (result.data?.material) {
+                    content += `Material: ${result.data.material}\n`;
+                }
+                if (result.data?.characters) {
+                    content += `Character(s): ${result.data.characters}\n`;
+                }
+                if (result.data?.ext_urls) {
+                    content += "**Link(s):**\n";
+                    result.data.ext_urls.forEach( link => {
+                        content += formatLink(link);
+                    });
+                }
+                
+                sauce.addField(title, content);
             }
         }
     });
@@ -98,6 +118,11 @@ function errorEmbed(code) {
     }
 
     return err;
+}
+
+function formatLink(link) {
+    let name = link.split("https://")[1].split("/")[0];
+    return `[${name}](${link})\n`
 }
 
 module.exports = {commandData, action, guild};
