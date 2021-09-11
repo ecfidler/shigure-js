@@ -4,6 +4,8 @@ const { Client, Intents } = require('discord.js');
 // Custom imports
 const auth = require('./auth.json');
 const commandManager = require("./utilities/command-manager");
+const { GUILDS } = require('./utilities/constants');
+const { joinSauceEmporium } = require('./events/joinSauceEmporium');
 
 // Client Instance
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS] });
@@ -29,6 +31,13 @@ client.on('interactionCreate', (interaction) => {
         commandManager.commandImports.get(interaction.commandName).action(client, interaction);
     }
 });
+
+client.on('guildMemberAdd', (member) => {
+    if (member.guild.id == GUILDS.YONI) {
+        joinSauceEmporium(member);
+    }
+
+})
 
 // Login
 client.login(auth.token);
