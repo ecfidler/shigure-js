@@ -30,6 +30,6 @@ const EMOJIS = {
     SPEAK : "🕵",
 }
 
-const OWNER = "173839815400357888"
+const OWNER = "173839815400357888";
 
 module.exports = { GUILDS, CHANNELS, ROLES, EMOJIS, OWNER }
