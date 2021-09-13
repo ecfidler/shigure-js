@@ -3,9 +3,10 @@ const { Client, Intents } = require('discord.js');
 
 // Custom imports
 const auth = require('./auth.json');
-const commandManager = require("./utilities/command-manager");
+const commandManager = require('./utilities/command-manager');
 const { GUILDS } = require('./utilities/constants');
-const { joinSauceEmporium } = require('./events/joinSauceEmporium');
+const { joinSauceEmporiumEvent } = require('./events/joinSauceEmporium');
+const { toggleRoleButtonEvent } = require('./events/toggleRoleButton');
 
 // Client Instance
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS] });
@@ -27,14 +28,20 @@ client.on('interactionCreate', (interaction) => {
     }
 
     if (interaction.isContextMenu()) {
-        // What else do I need to add here?
         commandManager.commandImports.get(interaction.commandName).action(client, interaction);
+    }
+
+    if (interaction.isButton()) {
+        if (interaction.customId.startsWith("toggleRoleButton_")) {
+            // pass the interaction into a function to sort out the issues
+            toggleRoleButtonEvent(client, interaction);
+        }
     }
 });
 
 client.on('guildMemberAdd', (member) => {
     if (member.guild.id == GUILDS.YONI) {
-        joinSauceEmporium(member);
+        joinSauceEmporiumEvent(member);
     }
 
 })

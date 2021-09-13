@@ -14,47 +14,55 @@ async function action(client, interaction) {
     let rows = [];
 
     // select the correct role array array
-    if (interaction.guild.id == GUILDS.YONI) {
-        roleData = roles.sauce.rows;
-    }
-    else if (interaction.guild.id == GUILDS.WHID) {
-        roleData = roles.whid.rows;
-    }
-    else {
+    if (!roles?.[interaction.guild.id]) {
         interaction.reply({ content: "\'roleup\' is not availible in this server, sorry.", ephemeral: true});
         return;
     }
+    else {
+        roleData = roles[interaction.guild.id].rows;
+    }
 
-    roleData.forEach(row => {
+    rows = getButtonRows(roleData, interaction.member);
+
+    interaction.reply({ embeds: [roleMenuHeader], components: rows, ephemeral: true});
+
+}
+
+function getButtonRows(serverRoleData, member) {
+    let buffer = []
+    serverRoleData.forEach(row => {
         let actionRow = new MessageActionRow();
         row.forEach(role => {
             actionRow.addComponents(
                 new MessageButton()
                     .setLabel(role.name)
-                    .setStyle("PRIMARY") // CHANGE TO BE THE LOGIC TO CHECK IF THE USER HAS THE ROLE OR NOT: hasRole(role.id) ? "PRIMARY" : "DANGER"; where hasRole is a function to return true if the member has the role.
+                    .setStyle(hasRole(member, role.id) ? "SUCCESS" : "SECONDARY")
                     .setEmoji(role.emoji)
-                    .setCustomId(`toggleRoleButton_${role.name}`) // if the role name is Role, the custom id will be "toggleRoleButton_Role"
+                    .setCustomId(`toggleRoleButton_${role.id}`) // if the role id is 12345, the custom id will be "toggleRoleButton_12345"
             );
             
         });
-        rows.push(actionRow);
+        buffer.push(actionRow);
     });
 
-    interaction.reply({ content: "Click on a role below to add or remove it from your user", components: rows, ephemeral: true});
-
+    return buffer;
 }
 
-module.exports = {commandData, action, guild};
+function hasRole(member, id) {
+    return member.roles.cache.has(id);
+}
 
-/*
-const row = new MessageActionRow()
-        .addComponents(
-            new MessageButton()
-                .setLabel("Connisseur")
-                .setStyle("PRIMARY")
-                .setEmoji(EMOJIS.SPEAK)
-                .setCustomId("toggleRoleButton_Connisseur")
-        );
+const roleMenuHeader = new MessageEmbed()
+    .setDescription("Click on a grey role to add it, click on a green role to remove it!")
+    .setColor("BLURPLE")
+    .setAuthor("/roleup") // TODO: add author icon?
+    .setTimestamp();
 
-    await interaction.channel.send({ content: "Click a button to recieve a corresponding role!", components: [toggleSpeakeasy], ephemeral: true } ); // MAKE IT FALSE EVENTUALLY
+module.exports = {commandData, action, guild, getButtonRows, hasRole, roleMenuHeader};
+
+/* TODO
+- Add logic to toggle the role
+- add hasRole
+- make the button change color when it gets added/removed
+- add embed instead of message content?
 */
