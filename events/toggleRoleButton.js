@@ -17,8 +17,12 @@ async function toggleRoleButtonEvent(client, interaction) {
     else {
         await interaction.member.roles.add(roleId);
     }
-
-    await interaction.update({ embeds: [roleMenuHeader], components: getButtonRows(roles[interaction.guild.id].rows,interaction.member), ephemeral: true});
+    // interaction.rows
+    //await interaction.update({
+    //    embeds: [roleMenuHeader],
+    //    components: getButtonRows(roles[interaction.guild.id].rows, interaction.member),
+    //    ephemeral: true
+    //});
 }
 
 module.exports = { toggleRoleButtonEvent };

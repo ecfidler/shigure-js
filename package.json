@@ -25,7 +25,7 @@
     "@discordjs/opus": "^0.5.3",
     "@discordjs/voice": "^0.6.0",
     "bufferutil": "^4.0.3",
-    "discord.js": "^13.1.0",
+    "discord.js": "^13.2.0",
     "erlpack": "github:discord/erlpack",
     "file-type": "^16.5.3",
     "node-gyp": "^8.2.0",
