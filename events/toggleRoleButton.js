@@ -17,12 +17,17 @@ async function toggleRoleButtonEvent(client, interaction) {
     else {
         await interaction.member.roles.add(roleId);
     }
-    // interaction.rows
-    //await interaction.update({
-    //    embeds: [roleMenuHeader],
-    //    components: getButtonRows(roles[interaction.guild.id].rows, interaction.member),
-    //    ephemeral: true
-    //});
+    for (row of interaction.message.components) {
+        let button = row.components.find(button => button.customId === interaction.customId);
+        if (button) {
+            button.setStyle(has ? "SECONDARY" : "SUCCESS");
+        }
+    }
+    await interaction.update({
+        embeds: [roleMenuHeader],
+        components: interaction.message.components,
+        ephemeral: true
+    });
 }
 
 module.exports = { toggleRoleButtonEvent };
