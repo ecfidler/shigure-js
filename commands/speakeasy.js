@@ -16,11 +16,11 @@ async function action(client, interaction) {
 
     if (has) {
         await interaction.member.roles.remove(ROLES.NSFW);
-        await interaction.reply({embeds: [makeEmbed("Removed the Connoisseur role\nYou can no longer view the Speakeasy")], ephemeral: true});
+        await interaction.reply({embeds: [makeEmbed("Removed the Connoisseur role.\nYou can no longer view the Speakeasy category.")], ephemeral: true});
     }
     else {
         await interaction.member.roles.add(ROLES.NSFW);
-        await interaction.reply({embeds: [makeEmbed("Added the Connoisseur role\nYou can now view the Speakeasy")], ephemeral: true});
+        await interaction.reply({embeds: [makeEmbed("Added the Connoisseur role.\nYou can now view the Speakeasy category.")], ephemeral: true});
     }
 
 }

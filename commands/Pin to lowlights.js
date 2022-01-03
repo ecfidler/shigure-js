@@ -33,7 +33,7 @@ async function action(client, interaction) {
                 .setURL(lowlight.url)
         );
 
-    await interaction.reply({ content: "Success!", components: [jumpButton], ephemeral: true } );
+    await interaction.reply({ content: "Success!",/* components: [jumpButton],*/ ephemeral: true } );
 }
 
 function transcribe(message, member, pinner) {
