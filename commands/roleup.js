@@ -25,6 +25,7 @@ const commandData = {
                 }
             ],
             type : "STRING",
+            required : true,
         }
     ],
     type : "CHAT_INPUT",
@@ -48,6 +49,8 @@ async function action(client, interaction) {
         interaction.reply({ content: "\'roleup\' is not availible in this server, sorry.", ephemeral: true});
         return;
     }
+
+    let option = null
 
     let roleData = findRoles(interaction.options.get("category").value, interaction.guild);
     
