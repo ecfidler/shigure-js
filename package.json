@@ -30,6 +30,7 @@
     "file-type": "^16.5.3",
     "node-gyp": "^8.2.0",
     "saucenao": "^0.0.2",
+    "snoowrap": "^1.23.0",
     "tweetnacl": "^1.0.3",
     "utf-8-validate": "^5.0.5",
     "zlib-sync": "^0.1.7"
