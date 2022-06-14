@@ -6,6 +6,7 @@ const commandImports = new Map();
 module.exports = {loadCommands, commandImports};
 
 async function loadCommands(client) {
+  
   console.info("Loading commands...");
   const commands = fs.readdirSync("./commands");
 
@@ -36,7 +37,12 @@ async function loadCommands(client) {
 
   specializedCommands.forEach(async (specialCommands, guildID) => {
     const guild = client.guilds.cache.get(guildID);
-    holUp.push(guild.commands.set(specialCommands));
+    if (guild != undefined) {
+      holUp.push(guild.commands.set(specialCommands));
+    }
+    else {
+      console.log("command is not in guild")
+    }
   });
 
   // Testing only
@@ -50,6 +56,7 @@ async function loadCommands(client) {
 
   console.info("Registered commands!");
 
+/*
   console.info("Setting permissions...");
 
   const holUp2 = [];
@@ -73,6 +80,25 @@ async function loadCommands(client) {
   await Promise.all(holUp2);
 
   console.info("Set permissions!");
+  
+  // Code to remove all commands from servers
+  console.log("deleting all commands");
+  await client.application.commands.fetch();
+  client.application.commands.cache.forEach(async (command) => {
+    console.log(`deleting ${command.name}`);
+    await command.delete();
+    console.log(`deleted ${command.name}`);
+  });
+
+  client.guilds.cache.forEach(async (guild) => {
+    await guild.commands.fetch();
+    guild.commands.cache.forEach(async (command) => {
+      console.log(`deleting ${command.name}`);
+      await command.delete();
+      console.log(`deleted ${command.name}`);
+    });
+  });
+  */
 }
 
 function reloadCommands(client) {

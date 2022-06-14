@@ -4,14 +4,6 @@ const guild = GUILDS.WHID;
 
 const commandData = {
     description : "call and replay",
-    defaultPermission: false,
-    permissions : [
-        {
-            id: OWNER,
-            type: "USER",
-            permission: true,
-        }
-    ],
     options : [
         {
             name: "content",
