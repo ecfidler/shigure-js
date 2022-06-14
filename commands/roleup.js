@@ -121,7 +121,7 @@ function makeEmojiURL(role) {
 }
 
 function emojify(text) {
-    return text.replace(' ', '_');
+    return text.replaceAll(' ', '_');
 }
 
 function getButtonRows(serverRoles, member) {
