@@ -26,7 +26,7 @@ client.once("ready", () => {
     });
 });
 
-client.on("interactionCreate", (interaction) => {
+client.on("interactionCreate", interaction => {
     if (interaction.isCommand()) {
         commandManager.commandImports
             .get(interaction.commandName)
@@ -47,7 +47,7 @@ client.on("interactionCreate", (interaction) => {
     }
 });
 
-client.on("guildMemberAdd", (member) => {
+client.on("guildMemberAdd", member => {
     if (member.guild.id == GUILDS.YONI) {
         joinSauceEmporiumEvent(member);
     }

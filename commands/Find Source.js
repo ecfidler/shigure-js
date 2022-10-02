@@ -71,7 +71,7 @@ function formatSauce(payload, thumbnail) {
             "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/twitter/282/steaming-bowl_1f35c.png"
         );
 
-    payload.results.forEach((result) => {
+    payload.results.forEach(result => {
         if (parseInt(result.header.similarity) > 55) {
             // Only want results with similarity > 55
 
@@ -120,7 +120,7 @@ function formatSauce(payload, thumbnail) {
                 }
                 if (result.data?.ext_urls) {
                     content += "**Link(s):**\n";
-                    result.data.ext_urls.forEach((link) => {
+                    result.data.ext_urls.forEach(link => {
                         content += formatLink(link);
                     });
                 }

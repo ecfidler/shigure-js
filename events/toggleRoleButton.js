@@ -16,7 +16,7 @@ async function toggleRoleButtonEvent(client, interaction) {
     }
     for (let row of interaction.message.components) {
         let button = row.components.find(
-            (button) => button.customId === interaction.customId
+            button => button.customId === interaction.customId
         );
         if (button) {
             button.setStyle(has ? "SECONDARY" : "SUCCESS");
