@@ -7,6 +7,7 @@ const commandManager = require("./utilities/command-manager");
 const { GUILDS } = require("./utilities/constants");
 const { joinSauceEmporiumEvent } = require("./events/joinSauceEmporium");
 const { toggleRoleButtonEvent } = require("./events/toggleRoleButton");
+const { changeRolesPageEvent } = require("./events/changeRolesPage");
 
 // Client Instance
 const client = new Client({
@@ -43,6 +44,8 @@ client.on("interactionCreate", interaction => {
         if (interaction.customId.startsWith("toggleRoleButton_")) {
             // pass the interaction into a function to sort out the issues
             toggleRoleButtonEvent(client, interaction);
+        } else if (interaction.customId.startsWith("changeRolesPage_")) {
+            changeRolesPageEvent(client, interaction);
         }
     }
 });
