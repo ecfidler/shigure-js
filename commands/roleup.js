@@ -74,11 +74,11 @@ async function action(client, interaction) {
 
 function findRoles(option, guild) {
     const guildRoles = guild.roles.cache;
-    let start = guildRoles.find((role) => role.name === "#Category_" + option);
-    let end = guildRoles.find((role) => role.name === "#EndCategory_" + option);
+    let start = guildRoles.find(role => role.name === "#Category_" + option);
+    let end = guildRoles.find(role => role.name === "#EndCategory_" + option);
     let roles = [];
 
-    guildRoles.each((role) => {
+    guildRoles.each(role => {
         if (
             role.comparePositionTo(start) < 0 &&
             role.comparePositionTo(end) > 0
@@ -101,6 +101,7 @@ async function resolveRoleEmoji(guildEmojis, role) {
     if (role.unicodeEmoji)
         // e.g. "💩"
         return role.unicodeEmoji;
+
     if (!role.icon) return null;
 
     try {
@@ -117,7 +118,7 @@ async function resolveRoleEmoji(guildEmojis, role) {
 
 async function getCustomRoleEmoji(emojis, role) {
     let emoji = await emojis.cache.find(
-        (emoji) => emoji.name === emojify(role.name)
+        emoji => emoji.name === emojify(role.name)
     );
     if (!emoji) {
         throw new EmojiNotFoundError(

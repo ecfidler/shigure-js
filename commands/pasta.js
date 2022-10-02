@@ -27,7 +27,7 @@ async function action(client, interaction) {
     redditClient
         .getRandomSubmission("copypasta")
         .then(
-            async (value) => {
+            async value => {
                 if (value.selftext) {
                     if (value.selftext.length < 2000) {
                         await interaction.editReply(value.selftext);
@@ -44,12 +44,12 @@ async function action(client, interaction) {
                     await interaction.editReply(errorMessage);
                 }
             },
-            async (value) => {
+            async value => {
                 console.error(value);
                 await interaction.editReply(errorMessage);
             }
         )
-        .catch((err) => {
+        .catch(err => {
             console.log(err);
         });
 }
