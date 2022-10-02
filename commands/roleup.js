@@ -35,13 +35,9 @@ const commandData = {
     type: "CHAT_INPUT",
 };
 
-const roleMenuHeader = new MessageEmbed()
-    .setDescription(
-        "Click on a grey role to add it, click on a green role to remove it!"
-    )
-    .setColor("BLURPLE")
-    .setAuthor("/roleup") // TODO: add author icon?
-    .setTimestamp();
+const roleMenuHeader = new MessageEmbed().setColor("BLURPLE").setAuthor({
+    name: "Click on a grey role to add it, click on a green role to remove it!",
+}); // TODO: add author icon?
 
 class EmojiNotFoundError extends Error {
     constructor(message) {
