@@ -1,39 +1,42 @@
 {
-  "name": "shigure",
-  "version": "1.0.0",
-  "description": "discord.js rewrite of my discord.py bot shigure",
-  "main": "index.js",
-  "scripts": {
-    "test": "node index"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/ecfidler/shigure-js.git"
-  },
-  "keywords": [
-    "shigure",
-    "discord",
-    "bot"
-  ],
-  "author": "Ethan Fidler",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/ecfidler/shigure-js/issues"
-  },
-  "homepage": "https://github.com/ecfidler/shigure-js#readme",
-  "dependencies": {
-    "bufferutil": "^4.0.6",
-    "discord.js": "^13.8.0",
-    "file-type": "^16.5.3",
-    "node-gyp": "^9.0.0",
-    "saucenao": "^0.0.2",
-    "snoowrap": "^1.23.0",
-    "utf-8-validate": "^5.0.9",
-    "zlib-sync": "^0.1.7"
-  },
-  "devDependencies": {
-    "eslint": "^7.32.0",
-    "eslint-config-prettier": "^8.5.0",
-    "prettier": "2.7.1"
-  }
+    "name": "shigure",
+    "version": "1.0.0",
+    "description": "discord.js rewrite of my discord.py bot shigure",
+    "main": "index.js",
+    "scripts": {
+        "test": "node index"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/ecfidler/shigure-js.git"
+    },
+    "keywords": [
+        "shigure",
+        "discord",
+        "bot"
+    ],
+    "author": "Ethan Fidler",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/ecfidler/shigure-js/issues"
+    },
+    "homepage": "https://github.com/ecfidler/shigure-js#readme",
+    "dependencies": {
+        "bufferutil": "^4.0.6",
+        "discord.js": "^13.8.0",
+        "file-type": "^16.5.3",
+        "node-gyp": "^9.0.0",
+        "saucenao": "^0.0.2",
+        "snoowrap": "^1.23.0",
+        "utf-8-validate": "^5.0.9",
+        "zlib-sync": "^0.1.7"
+    },
+    "devDependencies": {
+        "eslint": "^7.32.0",
+        "eslint-config-prettier": "^8.5.0",
+        "prettier": "2.7.1"
+    },
+    "prettier": {
+        "tabWidth": 4
+    }
 }

@@ -1,38 +1,44 @@
 const { MessageEmbed, MessageActionRow, MessageButton } = require("discord.js");
-const { CHANNELS, GUILDS, EMOJIS, ROLES, MAXIMUMBUTTONROWS, BUTTONROWMAXLENGTH } = require("../utilities/constants.js");
-const roles = require("../assets/data/roles.json");
+const {
+    GUILDS,
+    MAXIMUMBUTTONROWS,
+    BUTTONROWMAXLENGTH,
+} = require("../utilities/constants.js");
 
 const guild = GUILDS.GLOBAL;
 
 const commandData = {
-    description : "Opens a menu to allow you to add or remove roles from yourself",
-    options : [
+    description:
+        "Opens a menu to allow you to add or remove roles from yourself",
+    options: [
         {
-            name : "category",
-            description : "The category of roles that you wish to choose from",
-            choices : [
+            name: "category",
+            description: "The category of roles that you wish to choose from",
+            choices: [
                 {
-                    name : "Interests",
-                    value : "interests"
+                    name: "Interests",
+                    value: "interests",
                 },
                 {
-                    name : "Languages",
-                    value : "languages"
+                    name: "Languages",
+                    value: "languages",
                 },
                 {
-                    name : "Schools",
-                    value : "schools"
-                }
+                    name: "Schools",
+                    value: "schools",
+                },
             ],
-            type : "STRING",
-            required : true,
-        }
+            type: "STRING",
+            required: true,
+        },
     ],
-    type : "CHAT_INPUT",
+    type: "CHAT_INPUT",
 };
 
 const roleMenuHeader = new MessageEmbed()
-    .setDescription("Click on a grey role to add it, click on a green role to remove it!")
+    .setDescription(
+        "Click on a grey role to add it, click on a green role to remove it!"
+    )
     .setColor("BLURPLE")
     .setAuthor("/roleup") // TODO: add author icon?
     .setTimestamp();
@@ -46,30 +52,41 @@ class EmojiNotFoundError extends Error {
 
 async function action(client, interaction) {
     if (interaction.guild.id !== GUILDS.WHID) {
-        interaction.reply({ content: "\'roleup\' is not availible in this server, sorry.", ephemeral: true});
+        interaction.reply({
+            content: "'roleup' is not availible in this server, sorry.",
+            ephemeral: true,
+        });
         return;
     }
 
-    let option = null
+    let roleData = findRoles(
+        interaction.options.get("category").value,
+        interaction.guild
+    );
 
-    let roleData = findRoles(interaction.options.get("category").value, interaction.guild);
-    
     let guildEmojis = client.guilds.cache.get(GUILDS.ROLE).emojis;
     await getOrMakeRoleEmojis(guildEmojis, roleData);
-    
+
     let rows = getButtonRows(roleData, interaction.member);
 
-    interaction.reply({ embeds: [roleMenuHeader], components: rows, ephemeral: true});
+    interaction.reply({
+        embeds: [roleMenuHeader],
+        components: rows,
+        ephemeral: true,
+    });
 }
 
 function findRoles(option, guild) {
-    guildRoles = guild.roles.cache;
-    let start = guildRoles.find(role => role.name === ("#Category_"+option));
-    let end = guildRoles.find(role => role.name === ("#EndCategory_"+option));
+    const guildRoles = guild.roles.cache;
+    let start = guildRoles.find((role) => role.name === "#Category_" + option);
+    let end = guildRoles.find((role) => role.name === "#EndCategory_" + option);
     let roles = [];
 
-    guildRoles.each(role => {
-        if (role.comparePositionTo(start) < 0 && role.comparePositionTo(end) > 0) {
+    guildRoles.each((role) => {
+        if (
+            role.comparePositionTo(start) < 0 &&
+            role.comparePositionTo(end) > 0
+        ) {
             roles.push(role);
             console.log(role.name);
         }
@@ -81,14 +98,14 @@ function findRoles(option, guild) {
 async function getOrMakeRoleEmojis(guildEmojis, roles) {
     for (let role of roles) {
         role.emoji = await resolveRoleEmoji(guildEmojis, role);
-    };
+    }
 }
 
 async function resolveRoleEmoji(guildEmojis, role) {
-    if (role.unicodeEmoji) // e.g. "💩"
+    if (role.unicodeEmoji)
+        // e.g. "💩"
         return role.unicodeEmoji;
-    if (!role.icon)
-        return null;
+    if (!role.icon) return null;
 
     try {
         return await getCustomRoleEmoji(guildEmojis, role);
@@ -103,9 +120,13 @@ async function resolveRoleEmoji(guildEmojis, role) {
 }
 
 async function getCustomRoleEmoji(emojis, role) {
-    let emoji = await emojis.cache.find(emoji => emoji.name === emojify(role.name));
+    let emoji = await emojis.cache.find(
+        (emoji) => emoji.name === emojify(role.name)
+    );
     if (!emoji) {
-        throw new EmojiNotFoundError(`Could not find emoji for role ${role.name}`);
+        throw new EmojiNotFoundError(
+            `Could not find emoji for role ${role.name}`
+        );
     } else {
         return emoji;
     }
@@ -113,7 +134,7 @@ async function getCustomRoleEmoji(emojis, role) {
 
 async function makeCustomRoleEmoji(emojis, role) {
     let url = makeEmojiURL(role);
-    let result = await emojis.create(url, emojify(role.name));
+    await emojis.create(url, emojify(role.name));
 }
 
 function makeEmojiURL(role) {
@@ -121,7 +142,7 @@ function makeEmojiURL(role) {
 }
 
 function emojify(text) {
-    return text.replaceAll(' ', '_');
+    return text.replaceAll(" ", "_");
 }
 
 function getButtonRows(serverRoles, member) {
@@ -162,4 +183,11 @@ function hasRole(member, id) {
     return member.roles.cache.has(id);
 }
 
-module.exports = {commandData, action, guild, getButtonRows, hasRole, roleMenuHeader};
+module.exports = {
+    commandData,
+    action,
+    guild,
+    getButtonRows,
+    hasRole,
+    roleMenuHeader,
+};

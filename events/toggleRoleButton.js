@@ -1,6 +1,4 @@
-const { getButtonRows, hasRole, roleMenuHeader } = require("../commands/roleup");
-const roles = require("../assets/data/roles.json");
-
+const { hasRole, roleMenuHeader } = require("../commands/roleup");
 
 async function toggleRoleButtonEvent(client, interaction) {
     // the role id is interaction.customid.split("_")[1];
@@ -13,12 +11,13 @@ async function toggleRoleButtonEvent(client, interaction) {
 
     if (has) {
         await interaction.member.roles.remove(roleId);
-    }
-    else {
+    } else {
         await interaction.member.roles.add(roleId);
     }
-    for (row of interaction.message.components) {
-        let button = row.components.find(button => button.customId === interaction.customId);
+    for (let row of interaction.message.components) {
+        let button = row.components.find(
+            (button) => button.customId === interaction.customId
+        );
         if (button) {
             button.setStyle(has ? "SECONDARY" : "SUCCESS");
         }
@@ -26,7 +25,7 @@ async function toggleRoleButtonEvent(client, interaction) {
     await interaction.update({
         embeds: [roleMenuHeader],
         components: interaction.message.components,
-        ephemeral: true
+        ephemeral: true,
     });
 }
 

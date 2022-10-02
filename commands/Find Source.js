@@ -1,7 +1,7 @@
-const { MessageEmbed, MessageAttachment, CommandInteractionOptionResolver } = require("discord.js");
-const { CHANNELS, GUILDS, EMOJIS, ROLES } = require("../utilities/constants.js");
-const SauceNAO = require('saucenao');
-const auth = require('../auth.json');
+const { MessageEmbed, MessageAttachment } = require("discord.js");
+const { CHANNELS, GUILDS } = require("../utilities/constants.js");
+const SauceNAO = require("saucenao");
+const auth = require("../auth.json");
 
 //const fs = require(`fs`); // TESTING ONLY
 
@@ -10,23 +10,30 @@ const sauceFinder = new SauceNAO(auth["SauceNAO-key"]);
 
 // Attachments
 const icon = new MessageAttachment("./assets/images/icon.png");
-const doodle = new MessageAttachment("./assets/images/doodle.png");
-
+// const doodle = new MessageAttachment("./assets/images/doodle.png");
 
 const guild = GUILDS.GLOBAL;
 
 const commandData = {
-    type : "MESSAGE",
+    type: "MESSAGE",
 };
 
 async function action(client, interaction) {
-    let public = !((interaction.channel.id == CHANNELS.FINDER) || (interaction.guild.id != GUILDS.YONI));
-    let msg = await interaction.channel.messages.fetch(interaction.targetId)
+    let public = !(
+        interaction.channel.id == CHANNELS.FINDER ||
+        interaction.guild.id != GUILDS.YONI
+    );
+    let msg = await interaction.channel.messages.fetch(interaction.targetId);
     let attch = msg.attachments;
     console.log(attch);
 
-    if (attch.size == 0) { // When there is no image on target message
-        interaction.reply({ embeds: [errorEmbed("EMPTY")], files: [icon], ephemeral: true });
+    if (attch.size == 0) {
+        // When there is no image on target message
+        interaction.reply({
+            embeds: [errorEmbed("EMPTY")],
+            files: [icon],
+            ephemeral: true,
+        });
         return;
     }
 
@@ -36,58 +43,69 @@ async function action(client, interaction) {
 
     //fs.writeFileSync(`sauceData.json`, JSON.stringify(saucePayload, null, 2)); // TESTING ONLY
 
-
-    if (status) { // Error Returned
-        interaction.reply({ embeds: [errorEmbed(status)], files: [icon], ephemeral: public });
+    if (status) {
+        // Error Returned
+        interaction.reply({
+            embeds: [errorEmbed(status)],
+            files: [icon],
+            ephemeral: public,
+        });
         return;
     }
 
-    interaction.reply({ embeds: [formatSauce(saucePayload, objective)], files: [icon], ephemeral: public });
-
+    interaction.reply({
+        embeds: [formatSauce(saucePayload, objective)],
+        files: [icon],
+        ephemeral: public,
+    });
 }
 
 function formatSauce(payload, thumbnail) {
-
-    sauce = new MessageEmbed()
+    const sauce = new MessageEmbed()
         .setTitle("Source(s) found:")
         .setColor("BLURPLE")
-        .setAuthor("SauceNAO", "attachment://icon.png" , "https://saucenao.com/")
+        .setAuthor("SauceNAO", "attachment://icon.png", "https://saucenao.com/")
         .setThumbnail(thumbnail)
-        .setFooter("Results pulled from SauceNAO, contact @fops#1969 for assistance", "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/twitter/282/steaming-bowl_1f35c.png");
+        .setFooter(
+            "Results pulled from SauceNAO, contact @fops#1984 for assistance",
+            "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/twitter/282/steaming-bowl_1f35c.png"
+        );
 
-    payload.results.forEach(result => {
-        if (parseInt(result.header.similarity) > 55) { // Only want results with similarity > 55
+    payload.results.forEach((result) => {
+        if (parseInt(result.header.similarity) > 55) {
+            // Only want results with similarity > 55
 
             let idx = result.header.index_id;
-            if (idx == 5) { // Pixiv
+            if (idx == 5) {
+                // Pixiv
                 let title = "Pixiv";
-                let content = `Poster: ${result.data.member_name}`
-    
+                let content = `Poster: ${result.data.member_name}`;
+
                 if (result.data?.ext_urls[0]) {
-                    content += `\n [Link to Post](${result.data.ext_urls[0]})`
+                    content += `\n [Link to Post](${result.data.ext_urls[0]})`;
                 }
-                
+
                 sauce.addField(title, content);
-    
             }
 
-            if (idx == 41)  { // Twitter
+            if (idx == 41) {
+                // Twitter
                 let title = "Twitter";
                 let content = "";
 
                 if (result.data?.twitter_user_handle) {
                     content += `**Poster:** @${result.data.twitter_user_handle}`;
                 }
-                
+
                 if (result.data?.ext_urls[0]) {
-                    content += `\n [Link to Post](${result.data.ext_urls[0]})`
+                    content += `\n [Link to Post](${result.data.ext_urls[0]})`;
                 }
 
                 sauce.addField(title, content);
-
             }
 
-            if (idx == 9) { // Danbooru
+            if (idx == 9) {
+                // Danbooru
                 let title = "Boorus";
                 let content = "";
 
@@ -102,32 +120,38 @@ function formatSauce(payload, thumbnail) {
                 }
                 if (result.data?.ext_urls) {
                     content += "**Link(s):**\n";
-                    result.data.ext_urls.forEach( link => {
+                    result.data.ext_urls.forEach((link) => {
                         content += formatLink(link);
                     });
                 }
-                
+
                 sauce.addField(title, content);
             }
         }
     });
 
     if (sauce.fields.length == 0) {
-        sauce.addField("No accurate sources found...", "Try checking on the [main website](https://saucenao.com/) in the case of an error")
+        sauce.addField(
+            "No accurate sources found...",
+            "Try checking on the [main website](https://saucenao.com/) in the case of an error"
+        );
     }
 
     return sauce;
 }
 
 function errorEmbed(code) {
-    let text = (code > 0) ? "Server" : "Client";
+    const text = code > 0 ? "Server" : "Client";
 
-    err = new MessageEmbed()
+    const err = new MessageEmbed()
         .setTitle("Error")
         .setColor("RED")
-        .setAuthor("SauceNAO", "attachment://icon.png" , "https://saucenao.com/")
+        .setAuthor("SauceNAO", "attachment://icon.png", "https://saucenao.com/")
         .setDescription(`${text} error, Code: ${code}`)
-        .setFooter("contact @fops#1969 for assistance", "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/twitter/282/exclamation-mark_2757.png");
+        .setFooter(
+            "contact @fops#1984 for assistance",
+            "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/twitter/282/exclamation-mark_2757.png"
+        );
 
     if (code == "EMPTY") {
         err.setDescription("No image found in message");
@@ -137,8 +161,8 @@ function errorEmbed(code) {
 }
 
 function formatLink(link) {
-    let name = link.split("https://")[1].split("/")[0];
-    return `[${name}](${link})\n`
+    const name = link.split("https://")[1].split("/")[0];
+    return `[${name}](${link})\n`;
 }
 
-module.exports = {commandData, action, guild};
+module.exports = { commandData, action, guild };
