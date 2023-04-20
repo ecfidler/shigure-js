@@ -44,20 +44,21 @@ function createPinEmbed(message, member, pinner) {
     const pinEmbed = new MessageEmbed()
         .setColor(member.displayHexColor)
         .setTitle("Message Content")
-        .setAuthor(
-            member.displayName,
-            member.user.displayAvatarURL({ dynamic: true }),
-            message.url
-        )
+        .setAuthor({
+            name: member.displayName,
+            iconURL: member.user.displayAvatarURL({ dynamic: true }),
+            url: message.url,
+        })
         .setDescription(message.content)
         .setImage(
             message.attachments.last() ? message.attachments.last().url : null
         )
         .setTimestamp(message.createdAt)
-        .setFooter(
-            `${message.channel.name} | pinned by ${pinner}`,
-            "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/twitter/282/pushpin_1f4cc.png"
-        );
+        .setFooter({
+            text: `${message.channel.name} | pinned by ${pinner}`,
+            iconURL:
+                "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/twitter/282/pushpin_1f4cc.png",
+        });
     return pinEmbed;
 }
 
