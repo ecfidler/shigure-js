@@ -7,6 +7,7 @@ const commandManager = require("./utilities/command-manager");
 const { GUILDS } = require("./utilities/constants");
 const { joinSauceEmporiumEvent } = require("./events/joinSauceEmporium");
 const { toggleRoleButtonEvent } = require("./events/toggleRoleButton");
+const { changeRolesPageEvent } = require("./events/changeRolesPage");
 
 // Client Instance
 const client = new Client({
@@ -26,7 +27,7 @@ client.once("ready", () => {
     });
 });
 
-client.on("interactionCreate", (interaction) => {
+client.on("interactionCreate", interaction => {
     if (interaction.isCommand()) {
         commandManager.commandImports
             .get(interaction.commandName)
@@ -43,11 +44,13 @@ client.on("interactionCreate", (interaction) => {
         if (interaction.customId.startsWith("toggleRoleButton_")) {
             // pass the interaction into a function to sort out the issues
             toggleRoleButtonEvent(client, interaction);
+        } else if (interaction.customId.startsWith("changeRolesPage_")) {
+            changeRolesPageEvent(client, interaction);
         }
     }
 });
 
-client.on("guildMemberAdd", (member) => {
+client.on("guildMemberAdd", member => {
     if (member.guild.id == GUILDS.YONI) {
         joinSauceEmporiumEvent(member);
     }

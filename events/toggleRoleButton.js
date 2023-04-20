@@ -1,4 +1,5 @@
-const { hasRole, roleMenuHeader } = require("../commands/roleup");
+const { roleMenuHeader } = require("../commands/roleup");
+const { hasRole } = require("../utilities/roleup");
 
 async function toggleRoleButtonEvent(client, interaction) {
     // the role id is interaction.customid.split("_")[1];
@@ -16,7 +17,7 @@ async function toggleRoleButtonEvent(client, interaction) {
     }
     for (let row of interaction.message.components) {
         let button = row.components.find(
-            (button) => button.customId === interaction.customId
+            button => button.customId === interaction.customId
         );
         if (button) {
             button.setStyle(has ? "SECONDARY" : "SUCCESS");
