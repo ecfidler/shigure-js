@@ -36,6 +36,11 @@ const OWNER = "173839815400357888";
 const BUTTONROWMAXLENGTH = 5;
 const MAXIMUMBUTTONROWS = 5;
 
+/**
+ * Regex of characters not allowed in emoji names, such as spaces or periods.
+ */
+const DISALLOWED_EMOJI_CHARACTERS_REGEX = [/ \./]
+
 module.exports = {
     GUILDS,
     CHANNELS,
@@ -44,4 +49,5 @@ module.exports = {
     OWNER,
     BUTTONROWMAXLENGTH,
     MAXIMUMBUTTONROWS,
+    DISALLOWED_EMOJI_CHARACTERS_REGEX,
 };
