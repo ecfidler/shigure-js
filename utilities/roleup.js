@@ -3,6 +3,7 @@ const {
     BUTTON_ROW_MAX_LENGTH,
     GUILDS,
     MAXIMUM_BUTTON_ROWS,
+    DISALLOWED_EMOJI_CHARACTERS_REGEX,
 } = require("./constants");
 
 const MAXROLEROWS = MAXIMUM_BUTTON_ROWS - 1;
@@ -171,7 +172,7 @@ function makeEmojiURL(role) {
 }
 
 function emojify(text) {
-    return text.replaceAll(" ", "_");
+    return text.replaceAll(DISALLOWED_EMOJI_CHARACTERS_REGEX, "_");
 }
 
 module.exports = {
