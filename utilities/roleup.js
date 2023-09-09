@@ -8,13 +8,6 @@ const {
 
 const MAXROLEROWS = MAXIMUM_BUTTON_ROWS - 1;
 
-class EmojiNotFoundError extends Error {
-    constructor(message) {
-        super(message);
-        this.name = "EmojiNotFoundError";
-    }
-}
-
 function getButtonRows(serverRoles, member, category, page) {
     let rows = [];
 
@@ -136,30 +129,24 @@ async function resolveRoleEmoji(guildEmojis, role) {
         return null;
     }
 
-    try {
-        return getCustomRoleEmoji(guildEmojis, role);
-    } catch (error) {
-        if (error instanceof EmojiNotFoundError) {
-            await makeCustomRoleEmoji(guildEmojis, role);
-            return getCustomRoleEmoji(guildEmojis, role);
-        } else {
-            throw error;
-        }
+    const customRoleEmoji = await getCustomRoleEmoji(guildEmojis, role);
+
+    if (customRoleEmoji != null) {
+        return customRoleEmoji;
     }
+
+    await makeCustomRoleEmoji(guildEmojis, role);
+    const newCustomRoleEmoji = await getCustomRoleEmoji(guildEmojis, role);
+
+    if (newCustomRoleEmoji != null) {
+        return newCustomRoleEmoji;
+    }
+
+    throw new Error(`Could not create emoji for role ${role.name}`);
 }
 
 async function getCustomRoleEmoji(emojis, role) {
-    const emoji = await emojis.cache.find(
-        emoji => emoji.name === emojify(role.name)
-    );
-
-    if (emoji == null) {
-        throw new EmojiNotFoundError(
-            `Could not find emoji for role ${role.name}`
-        );
-    }
-
-    return emoji;
+    return emojis.cache.find(emoji => emoji.name === emojify(role.name));
 }
 
 async function makeCustomRoleEmoji(emojis, role) {
