@@ -1,12 +1,12 @@
 const { MessageActionRow, MessageButton } = require("discord.js");
 const {
-    BUTTONROWMAXLENGTH,
+    BUTTON_ROW_MAX_LENGTH,
     GUILDS,
-    MAXIMUMBUTTONROWS,
+    MAXIMUM_BUTTON_ROWS,
     DISALLOWED_EMOJI_CHARACTERS_REGEX,
 } = require("./constants");
 
-const MAXROLEROWS = MAXIMUMBUTTONROWS - 1;
+const MAXROLEROWS = MAXIMUM_BUTTON_ROWS - 1;
 
 class EmojiNotFoundError extends Error {
     constructor(message) {
@@ -20,8 +20,8 @@ function getButtonRows(serverRoles, member, category, page) {
 
     serverRoles.sort((a, b) => a.name.localeCompare(b.name));
 
-    if (serverRoles.length <= MAXIMUMBUTTONROWS * BUTTONROWMAXLENGTH) {
-        rows = getButtonRowsNoPages(serverRoles, member);
+    if (serverRoles.length <= MAXIMUM_BUTTON_ROWS * BUTTON_ROW_MAX_LENGTH) {
+        rows = getButtonRowsWithoutPages(serverRoles, member);
     } else {
         rows = getButtonRowsWithPages(serverRoles, member, category, page);
     }
@@ -29,9 +29,9 @@ function getButtonRows(serverRoles, member, category, page) {
     return rows;
 }
 
-function getButtonRowsNoPages(serverRoles, member) {
+function getButtonRowsWithoutPages(serverRoles, member) {
     const rows = [];
-    rows.push(...makeRoleRows(MAXIMUMBUTTONROWS, serverRoles, member));
+    rows.push(...makeRoleRows(MAXIMUM_BUTTON_ROWS, serverRoles, member));
     return rows;
 }
 
@@ -58,7 +58,7 @@ function getButtonRowsWithPages(serverRoles, member, category, page) {
 
 function moveToPage(page, serverRoles) {
     if (page > 0) {
-        serverRoles.splice(0, page * BUTTONROWMAXLENGTH * MAXROLEROWS);
+        serverRoles.splice(0, page * BUTTON_ROW_MAX_LENGTH * MAXROLEROWS);
     }
 }
 
@@ -76,7 +76,7 @@ function makeRoleRows(numRows, serverRoles, member) {
 function makeRowOfRoles(serverRoles, member) {
     const row = new MessageActionRow();
     let j = 0;
-    while (j < BUTTONROWMAXLENGTH && serverRoles.length > 0) {
+    while (j < BUTTON_ROW_MAX_LENGTH && serverRoles.length > 0) {
         const role = serverRoles.shift();
         row.addComponents(
             new MessageButton()
@@ -121,23 +121,27 @@ async function getRoles(client, category, guild) {
 }
 
 async function getOrMakeRoleEmojis(guildEmojis, roles) {
-    for (let role of roles) {
+    for (const role of roles) {
         role.emoji = await resolveRoleEmoji(guildEmojis, role);
     }
 }
 
 async function resolveRoleEmoji(guildEmojis, role) {
-    if (role.unicodeEmoji)
+    if (role.unicodeEmoji != null) {
         // e.g. "💩"
         return role.unicodeEmoji;
-    if (!role.icon) return null;
+    }
+
+    if (role.icon == null) {
+        return null;
+    }
 
     try {
-        return await getCustomRoleEmoji(guildEmojis, role);
+        return getCustomRoleEmoji(guildEmojis, role);
     } catch (error) {
         if (error instanceof EmojiNotFoundError) {
             await makeCustomRoleEmoji(guildEmojis, role);
-            return await getCustomRoleEmoji(guildEmojis, role);
+            return getCustomRoleEmoji(guildEmojis, role);
         } else {
             throw error;
         }
@@ -145,16 +149,17 @@ async function resolveRoleEmoji(guildEmojis, role) {
 }
 
 async function getCustomRoleEmoji(emojis, role) {
-    let emoji = await emojis.cache.find(
+    const emoji = await emojis.cache.find(
         emoji => emoji.name === emojify(role.name)
     );
-    if (!emoji) {
+
+    if (emoji == null) {
         throw new EmojiNotFoundError(
             `Could not find emoji for role ${role.name}`
         );
-    } else {
-        return emoji;
     }
+
+    return emoji;
 }
 
 async function makeCustomRoleEmoji(emojis, role) {
