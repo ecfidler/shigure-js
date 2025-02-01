@@ -64,7 +64,6 @@ async function loadCommands(client) {
     holUp.push(client.application.commands.set(globalCommands));
 
     await Promise.all(holUp);
-    console.debug(holUp);
 
     console.info("Registered commands!");
 
