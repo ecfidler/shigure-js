@@ -1,9 +1,9 @@
 const fs = require("fs");
 const path = require("path");
 
-const commandImports = new Map();
+const commandByCommandName = new Map();
 
-module.exports = { loadCommands, commandImports };
+module.exports = { loadCommands, commandByCommandName };
 
 async function loadCommands(client) {
     console.info("Loading commands...");
@@ -13,8 +13,11 @@ async function loadCommands(client) {
     const specializedCommandsByGuildId = new Map();
     for (let i = 0; i < commands.length; i++) {
         const commandName = path.basename(commands[i], ".js");
-        commandImports.set(commandName, require("../commands/" + commands[i]));
-        const command = commandImports.get(commandName);
+        commandByCommandName.set(
+            commandName,
+            require("../commands/" + commands[i])
+        );
+        const command = commandByCommandName.get(commandName);
         if (!command.commandData.name) {
             command.commandData.name = commandName;
         }
@@ -72,7 +75,7 @@ async function loadCommands(client) {
 
   client.guilds.cache.forEach((guild) => {
     guild.commands.cache.forEach((command) => {
-      const commandImport = commandImports.get(command.name);
+      const commandImport = commandByCommandName.get(command.name);
       if (commandImport.commandData.permissions) {
         holUp2.push(command.permissions.set({permissions: commandImport.commandData.permissions}));
       }
@@ -80,7 +83,7 @@ async function loadCommands(client) {
   });
 
   client.application.commands.cache.forEach((command) => {
-    const commandImport = commandImports.get(command.name);
+    const commandImport = commandByCommandName.get(command.name);
     if (commandImport.commandData.permissions) {
       holUp2.push(command.permissions.set({permissions: commandImport.commandData.permissions}));
     }

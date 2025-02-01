@@ -29,15 +29,17 @@ client.once("ready", () => {
 
 client.on("interactionCreate", interaction => {
     if (interaction.isCommand()) {
-        commandManager.commandImports
+        commandManager.commandByCommandName
             .get(interaction.commandName)
             .action(client, interaction);
+        return;
     }
 
-    if (interaction.isContextMenu()) {
-        commandManager.commandImports
+    if (interaction.isContextMenuCommand()) {
+        commandManager.commandByCommandName
             .get(interaction.commandName)
             .action(client, interaction);
+        return;
     }
 
     if (interaction.isButton()) {
@@ -47,6 +49,7 @@ client.on("interactionCreate", interaction => {
         } else if (interaction.customId.startsWith("changeRolesPage_")) {
             changeRolesPageEvent(client, interaction);
         }
+        return;
     }
 });
 
