@@ -3,11 +3,13 @@ const GUILDS = {
     YONI: "592214628550049794",
     TEST: "543283759407955974",
     ROLE: "906307865181048893",
+    BEN_TESTING: "571004411137097731",
     GLOBAL: "global",
 };
 
 const CHANNELS = {
     LOW: "580587430776930314", // lowlights channel in what have i done
+
     RULES: "592216496659496990", // rules channel in sauce emporium
     VALET: "675182191520776214", // welcome channel in sauce emporium
     MILD: "592222434396995604", // chef's choice mild in sauce emporium
@@ -17,6 +19,8 @@ const CHANNELS = {
     TPANTRY: "771774117422301215", // tbone's pantry in sauce emporium
     KITCHEN: "698708633831211078", // kitchen in sauce emporium
     FINDER: "592225004410896405", // sauce finder in sauce emporium
+
+    LOW_TEST: "674689826976694276", // spam in ben testing
 };
 
 const ROLES = {

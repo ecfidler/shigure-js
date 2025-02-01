@@ -10,7 +10,7 @@ async function loadCommands(client) {
     const commands = fs.readdirSync("./commands");
 
     const globalCommands = [];
-    const specializedCommands = new Map();
+    const specializedCommandsByGuildId = new Map();
     for (let i = 0; i < commands.length; i++) {
         const commandName = path.basename(commands[i], ".js");
         commandImports.set(commandName, require("../commands/" + commands[i]));
@@ -18,17 +18,25 @@ async function loadCommands(client) {
         if (!command.commandData.name) {
             command.commandData.name = commandName;
         }
+
         if (command.guild === "global") {
             globalCommands.push(command.commandData);
-        } else {
-            if (specializedCommands.has(command.guild)) {
-                specializedCommands
-                    .get(command.guild)
-                    .push(command.commandData);
-            } else {
-                specializedCommands.set(command.guild, [command.commandData]);
+        } else if (command.guild != null) {
+            pushOrCreate(
+                specializedCommandsByGuildId,
+                command.guild,
+                command.commandData
+            );
+        } else if (command.guilds != null) {
+            for (const guild of command.guilds) {
+                pushOrCreate(
+                    specializedCommandsByGuildId,
+                    guild,
+                    command.commandData
+                );
             }
         }
+
         console.info(`Loaded command: ${commandName}`);
     }
 
@@ -36,9 +44,9 @@ async function loadCommands(client) {
 
     const holUp = [];
 
-    specializedCommands.forEach(async (specialCommands, guildID) => {
+    specializedCommandsByGuildId.forEach((specialCommands, guildID) => {
         const guild = client.guilds.cache.get(guildID);
-        if (guild != undefined) {
+        if (guild != null) {
             holUp.push(guild.commands.set(specialCommands));
         } else {
             console.log("command is not in guild");
@@ -53,6 +61,7 @@ async function loadCommands(client) {
     holUp.push(client.application.commands.set(globalCommands));
 
     await Promise.all(holUp);
+    console.debug(holUp);
 
     console.info("Registered commands!");
 
@@ -101,6 +110,13 @@ async function loadCommands(client) {
   */
 }
 
+function pushOrCreate(map, key, value) {
+    if (map.has(key)) {
+        map.get(key).push(value);
+    } else {
+        map.set(key, [value]);
+    }
+}
 // function reloadCommands(client) {}
 
 // function reloadCommand(client) {}
