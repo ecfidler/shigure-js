@@ -1,6 +1,7 @@
 const snoowrap = require("snoowrap");
 const { GUILDS } = require("../utilities/constants.js");
 const auth = require("../auth.json");
+const { ApplicationCommandType } = require("discord.js");
 
 // Reddit Client
 const redditClient = new snoowrap({
@@ -18,7 +19,7 @@ const guild = GUILDS.WHID;
 
 const commandData = {
     description: "gets a random piece of artwork from r/copypasta.",
-    type: "CHAT_INPUT",
+    type: ApplicationCommandType.ChatInput,
 };
 
 async function action(client, interaction) {

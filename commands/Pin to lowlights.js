@@ -1,4 +1,8 @@
-const { MessageEmbed } = require("discord.js");
+const {
+    EmbedBuilder,
+    ApplicationCommandType,
+    ApplicationCommandOptionType,
+} = require("discord.js");
 const {
     CHANNELS,
     GUILDS,
@@ -13,15 +17,17 @@ const commandData = {
     permissions: [
         {
             id: ROLES.MAJOR,
-            type: "ROLE",
+            type: ApplicationCommandOptionType.Role,
             permission: true,
         },
     ],
-    type: "MESSAGE",
+    type: ApplicationCommandType.Message,
 };
 
 async function action(client, interaction) {
-    const msg = await interaction.channel.messages.fetch(interaction.targetId);
+    const msg = await interaction.channel.messages.fetch({
+        message: interaction.targetId,
+    });
     const mbr = await interaction.guild.members.fetch(msg.author.id);
 
     await pinMessage(msg, mbr, interaction, client);
@@ -41,12 +47,12 @@ async function pinMessage(msg, mbr, interaction, client) {
 }
 
 function createPinEmbed(message, member, pinner) {
-    const pinEmbed = new MessageEmbed()
+    const pinEmbed = new EmbedBuilder()
         .setColor(member.displayHexColor)
         .setTitle("Message Content")
         .setAuthor({
             name: member.displayName,
-            iconURL: member.user.displayAvatarURL({ dynamic: true }),
+            iconURL: member.user.displayAvatarURL({}),
             url: message.url,
         })
         .setDescription(message.content)

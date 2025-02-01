@@ -1,4 +1,4 @@
-const { MessageEmbed } = require("discord.js");
+const { EmbedBuilder, ApplicationCommandType } = require("discord.js");
 const { hasRole } = require("../commands/roleup");
 
 const { GUILDS, ROLES } = require("../utilities/constants.js");
@@ -7,7 +7,7 @@ const guild = GUILDS.YONI;
 
 const commandData = {
     description: "toggle the NSFW role on yourself",
-    type: "CHAT_INPUT",
+    type: ApplicationCommandType.ChatInput,
 };
 
 async function action(client, interaction) {
@@ -37,10 +37,10 @@ async function action(client, interaction) {
 }
 
 function makeEmbed(text) {
-    let embed = new MessageEmbed()
+    let embed = new EmbedBuilder()
         .setDescription(text)
         .setColor("BLURPLE")
-        .setAuthor("/speakeasy")
+        .setAuthor({ name: "/speakeasy" })
         .setTimestamp();
 
     return embed;

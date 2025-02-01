@@ -1,4 +1,8 @@
-const { MessageEmbed, MessageAttachment } = require("discord.js");
+const {
+    EmbedBuilder,
+    AttachmentBuilder,
+    ApplicationCommandType,
+} = require("discord.js");
 const { CHANNELS, GUILDS } = require("../utilities/constants.js");
 const SauceNAO = require("saucenao");
 const auth = require("../auth.json");
@@ -8,14 +12,19 @@ const auth = require("../auth.json");
 // Setup Sauce finder
 const sauceFinder = new SauceNAO(auth["SauceNAO-key"]);
 
+const SAUCE_NAO_AUTHOR = {
+    name: "SauceNAO",
+    iconURL: "attachment://icon.png",
+    url: "https://saucenao.com/",
+};
+
 // Attachments
-const icon = new MessageAttachment("./assets/images/icon.png");
-// const doodle = new MessageAttachment("./assets/images/doodle.png");
+const icon = new AttachmentBuilder("./assets/images/icon.png");
 
 const guild = GUILDS.GLOBAL;
 
 const commandData = {
-    type: "MESSAGE",
+    type: ApplicationCommandType.Message,
 };
 
 async function action(client, interaction) {
@@ -23,7 +32,9 @@ async function action(client, interaction) {
         interaction.channel.id == CHANNELS.FINDER ||
         interaction.guild.id != GUILDS.YONI
     );
-    let msg = await interaction.channel.messages.fetch(interaction.targetId);
+    let msg = await interaction.channel.messages.fetch({
+        message: interaction.targetId,
+    });
     let attch = msg.attachments;
     console.log(attch);
 
@@ -61,15 +72,17 @@ async function action(client, interaction) {
 }
 
 function formatSauce(payload, thumbnail) {
-    const sauce = new MessageEmbed()
+    const sauce = new EmbedBuilder()
         .setTitle("Source(s) found:")
         .setColor("BLURPLE")
-        .setAuthor("SauceNAO", "attachment://icon.png", "https://saucenao.com/")
+        .setAuthor(SAUCE_NAO_AUTHOR)
         .setThumbnail(thumbnail)
-        .setFooter(
-            "Results pulled from SauceNAO, contact @fops#1984 for assistance",
-            "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/twitter/282/steaming-bowl_1f35c.png"
-        );
+        .setFooter({
+            text: "Results pulled from SauceNAO, contact @fops#1984 for assistance",
+            // TODO: This icon URL is broken. Find a new one.
+            iconURL:
+                "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/twitter/282/steaming-bowl_1f35c.png",
+        });
 
     payload.results.forEach(result => {
         if (parseInt(result.header.similarity) > 55) {
@@ -85,7 +98,7 @@ function formatSauce(payload, thumbnail) {
                     content += `\n [Link to Post](${result.data.ext_urls[0]})`;
                 }
 
-                sauce.addField(title, content);
+                sauce.addFields([title, content]);
             }
 
             if (idx == 41) {
@@ -101,7 +114,7 @@ function formatSauce(payload, thumbnail) {
                     content += `\n [Link to Post](${result.data.ext_urls[0]})`;
                 }
 
-                sauce.addField(title, content);
+                sauce.addFields([title, content]);
             }
 
             if (idx == 9) {
@@ -125,16 +138,16 @@ function formatSauce(payload, thumbnail) {
                     });
                 }
 
-                sauce.addField(title, content);
+                sauce.addFields([title, content]);
             }
         }
     });
 
     if (sauce.fields.length == 0) {
-        sauce.addField(
+        sauce.addFields([
             "No accurate sources found...",
-            "Try checking on the [main website](https://saucenao.com/) in the case of an error"
-        );
+            "Try checking on the [main website](https://saucenao.com/) in the case of an error",
+        ]);
     }
 
     return sauce;
@@ -143,15 +156,17 @@ function formatSauce(payload, thumbnail) {
 function errorEmbed(code) {
     const text = code > 0 ? "Server" : "Client";
 
-    const err = new MessageEmbed()
+    const err = new EmbedBuilder()
         .setTitle("Error")
         .setColor("RED")
-        .setAuthor("SauceNAO", "attachment://icon.png", "https://saucenao.com/")
+        .setAuthor(SAUCE_NAO_AUTHOR)
         .setDescription(`${text} error, Code: ${code}`)
-        .setFooter(
-            "contact @fops#1984 for assistance",
-            "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/twitter/282/exclamation-mark_2757.png"
-        );
+        .setFooter({
+            text: "Contact @fops#1984 for assistance",
+            // TODO: This icon URL is broken. Find a new one.
+            iconURL:
+                "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/twitter/282/exclamation-mark_2757.png",
+        });
 
     if (code == "EMPTY") {
         err.setDescription("No image found in message");

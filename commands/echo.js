@@ -1,4 +1,8 @@
 const { GUILDS } = require("../utilities/constants.js");
+const {
+    ApplicationCommandType,
+    ApplicationCommandOptionType,
+} = require("discord.js");
 
 const guild = GUILDS.WHID;
 
@@ -8,11 +12,11 @@ const commandData = {
         {
             name: "content",
             description: "the message you want echoed",
-            type: "STRING",
+            type: ApplicationCommandOptionType.String,
             required: true,
         },
     ],
-    type: "CHAT_INPUT",
+    type: ApplicationCommandType.ChatInput,
 };
 
 async function action(client, interaction) {

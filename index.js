@@ -1,5 +1,5 @@
 // Package imports
-const { Client, Intents } = require("discord.js");
+const { Client, GatewayIntentBits, ActivityType } = require("discord.js");
 
 // Custom imports
 const auth = require("./auth.json");
@@ -11,7 +11,7 @@ const { changeRolesPageEvent } = require("./events/changeRolesPage");
 
 // Client Instance
 const client = new Client({
-    intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS],
+    intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers],
 });
 
 // On ready
@@ -23,7 +23,7 @@ client.once("ready", () => {
 
     // Set presence
     client.user.setPresence({
-        activities: [{ type: "LISTENING", name: "the rain" }],
+        activities: [{ type: ActivityType.Listening, name: "the rain" }],
     });
 });
 
