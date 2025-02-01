@@ -2,6 +2,7 @@ const {
     EmbedBuilder,
     AttachmentBuilder,
     ApplicationCommandType,
+    Colors,
 } = require("discord.js");
 const { CHANNELS, GUILDS } = require("../utilities/constants.js");
 const SauceNAO = require("saucenao");
@@ -74,7 +75,7 @@ async function action(client, interaction) {
 function formatSauce(payload, thumbnail) {
     const sauce = new EmbedBuilder()
         .setTitle("Source(s) found:")
-        .setColor("BLURPLE")
+        .setColor(Colors.Blurple)
         .setAuthor(SAUCE_NAO_AUTHOR)
         .setThumbnail(thumbnail)
         .setFooter({
@@ -158,7 +159,7 @@ function errorEmbed(code) {
 
     const err = new EmbedBuilder()
         .setTitle("Error")
-        .setColor("RED")
+        .setColor(Colors.Red)
         .setAuthor(SAUCE_NAO_AUTHOR)
         .setDescription(`${text} error, Code: ${code}`)
         .setFooter({

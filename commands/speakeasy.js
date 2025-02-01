@@ -1,4 +1,4 @@
-const { EmbedBuilder, ApplicationCommandType } = require("discord.js");
+const { EmbedBuilder, ApplicationCommandType, Colors } = require("discord.js");
 const { hasRole } = require("../commands/roleup");
 
 const { GUILDS, ROLES } = require("../utilities/constants.js");
@@ -39,7 +39,7 @@ async function action(client, interaction) {
 function makeEmbed(text) {
     let embed = new EmbedBuilder()
         .setDescription(text)
-        .setColor("BLURPLE")
+        .setColor(Colors.Blurple)
         .setAuthor({ name: "/speakeasy" })
         .setTimestamp();
 

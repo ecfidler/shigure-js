@@ -4,13 +4,20 @@ const auth = require("../auth.json");
 const { ApplicationCommandType } = require("discord.js");
 
 // Reddit Client
-const redditClient = new snoowrap({
-    userAgent: auth.RuserAgent,
-    clientId: auth.RclientId,
-    clientSecret: auth.RclientSecret,
-    username: auth.Rusername,
-    password: auth.Rpassword,
-});
+let redditClient;
+let getRedditClientSingleton = () => {
+    if (redditClient == null) {
+        redditClient = new snoowrap({
+            userAgent: auth.RuserAgent,
+            clientId: auth.RclientId,
+            clientSecret: auth.RclientSecret,
+            username: auth.Rusername,
+            password: auth.Rpassword,
+        });
+    }
+
+    return redditClient;
+};
 
 const errorMessage =
     "OOPSIE WOOPSIE!! Uwu We made a fucky wucky!! A wittle fucko boingo! The code monkeys at our headquarters are working VEWY HAWD to fix this!\n_~error message_";
@@ -23,9 +30,17 @@ const commandData = {
 };
 
 async function action(client, interaction) {
+    const enablePastaCommand = checkAuthorizationHeadersForReddit(auth);
+    if (!enablePastaCommand) {
+        console.warning(
+            "No reddit API credentials provided. Reddit features will not work"
+        );
+        return;
+    }
+
     await interaction.deferReply();
 
-    redditClient
+    getRedditClientSingleton()
         .getRandomSubmission("copypasta")
         .then(
             async value => {
@@ -53,6 +68,16 @@ async function action(client, interaction) {
         .catch(err => {
             console.log(err);
         });
+}
+
+function checkAuthorizationHeadersForReddit(authObject) {
+    return (
+        authObject.RuserAgent != null &&
+        authObject.RclientId != null &&
+        authObject.RclientSecret != null &&
+        authObject.Rusername != null &&
+        authObject.Rpassword != null
+    );
 }
 
 module.exports = { commandData, action, guild };
