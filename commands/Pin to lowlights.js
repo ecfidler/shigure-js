@@ -36,15 +36,20 @@ const commandData = {
 };
 
 async function action(client, interaction) {
-    const msg = await interaction.channel.messages.fetch({
-        message: interaction.targetId,
-    });
-    const mbr = await interaction.guild.members.fetch(msg.author.id);
+    if (
+        !interaction.isMessageContextMenuCommand() ||
+        interaction.guildId == null
+    ) {
+        return;
+    }
+    const message = interaction.targetMessage;
+    message.forward(lowlightChannelByGuild[interaction.guildId]);
 
-    await pinMessage(msg, mbr, interaction, client);
+    const member = await interaction.guild.members.fetch(message.author.id);
+    await pinMessage(interaction, client, member);
 
-    await msg.react(EMOJIS.PIN);
-    await msg.reply(`${EMOJIS.PIN} Pinned!`);
+    await message.react(EMOJIS.PIN);
+    await message.reply(`${EMOJIS.PIN} Pinned!`);
 
     await interaction.reply({
         content: "Success!",
@@ -52,33 +57,17 @@ async function action(client, interaction) {
     });
 }
 
-async function pinMessage(msg, mbr, interaction, client) {
-    const embed = createPinEmbed(msg, mbr, interaction.member.displayName);
+async function pinMessage(interaction, client, member) {
     await client.channels.cache
         .get(lowlightChannelByGuild[interaction.guildId])
-        .send({ embeds: [embed] });
-}
-
-function createPinEmbed(message, member, pinner) {
-    const pinEmbed = new EmbedBuilder()
-        .setColor(member.displayHexColor)
-        .setTitle("Message Content")
-        .setAuthor({
-            name: member.displayName,
-            iconURL: member.user.displayAvatarURL({}),
-            url: message.url,
-        })
-        .setDescription(message.content)
-        .setImage(
-            message.attachments.last() ? message.attachments.last().url : null
-        )
-        .setTimestamp(message.createdAt)
-        .setFooter({
-            text: `${message.channel.name} | pinned by ${pinner}`,
-            iconURL:
-                "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/twitter/282/pushpin_1f4cc.png",
+        .send({
+            embeds: [
+                new EmbedBuilder().setColor(member.displayHexColor).setFooter({
+                    text: `${member.displayName}`,
+                    iconURL: member.user.displayAvatarURL(),
+                }),
+            ],
         });
-    return pinEmbed;
 }
 
 module.exports = {
