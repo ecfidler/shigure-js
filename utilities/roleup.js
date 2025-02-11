@@ -1,4 +1,4 @@
-const { MessageActionRow, MessageButton } = require("discord.js");
+const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 const {
     BUTTON_ROW_MAX_LENGTH,
     GUILDS,
@@ -33,15 +33,15 @@ function getButtonRowsWithPages(serverRoles, member, category, page) {
     moveToPage(page, serverRoles);
     rows.push(...makeRoleRows(MAXROLEROWS, serverRoles, member));
     rows.push(
-        new MessageActionRow().addComponents(
-            new MessageButton()
+        new ActionRowBuilder().addComponents(
+            new ButtonBuilder()
                 .setLabel("<")
-                .setStyle("PRIMARY")
+                .setStyle(ButtonStyle.Primary)
                 .setCustomId(`changeRolesPage_${category}_${page - 1}`)
                 .setDisabled(page === 0),
-            new MessageButton()
+            new ButtonBuilder()
                 .setLabel(">")
-                .setStyle("PRIMARY")
+                .setStyle(ButtonStyle.Primary)
                 .setCustomId(`changeRolesPage_${category}_${page + 1}`)
                 .setDisabled(serverRoles.length === 0)
         )
@@ -67,14 +67,18 @@ function makeRoleRows(numRows, serverRoles, member) {
 }
 
 function makeRowOfRoles(serverRoles, member) {
-    const row = new MessageActionRow();
+    const row = new ActionRowBuilder();
     let j = 0;
     while (j < BUTTON_ROW_MAX_LENGTH && serverRoles.length > 0) {
         const role = serverRoles.shift();
         row.addComponents(
-            new MessageButton()
+            new ButtonBuilder()
                 .setLabel(role.name)
-                .setStyle(hasRole(member, role.id) ? "SUCCESS" : "SECONDARY")
+                .setStyle(
+                    hasRole(member, role.id)
+                        ? ButtonStyle.Success
+                        : ButtonStyle.Secondary
+                )
                 .setEmoji(role.emoji)
                 .setCustomId(`toggleRoleButton_${role.id}`)
         );

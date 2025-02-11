@@ -1,4 +1,9 @@
-const { MessageEmbed } = require("discord.js");
+const {
+    EmbedBuilder,
+    ApplicationCommandType,
+    ApplicationCommandOptionType,
+    Colors,
+} = require("discord.js");
 const { GUILDS } = require("../utilities/constants.js");
 const { getButtonRows, getRoles } = require("../utilities/roleup.js");
 
@@ -25,14 +30,14 @@ const commandData = {
                     value: "schools",
                 },
             ],
-            type: "STRING",
+            type: ApplicationCommandOptionType.String,
             required: true,
         },
     ],
-    type: "CHAT_INPUT",
+    type: ApplicationCommandType.ChatInput,
 };
 
-const roleMenuHeader = new MessageEmbed().setColor("BLURPLE").setAuthor({
+const roleMenuHeader = new EmbedBuilder().setColor(Colors.Blurple).setAuthor({
     name: "Click on a grey role to add it, click on a green role to remove it!",
 }); // TODO: add author icon?
 

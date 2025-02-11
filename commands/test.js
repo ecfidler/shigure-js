@@ -1,3 +1,8 @@
+const {
+    ApplicationCommandType,
+    ApplicationCommandOptionType,
+} = require("discord.js");
+
 const guild = "173840048343482368";
 
 const commandData = {
@@ -20,11 +25,11 @@ const commandData = {
                     value: "pong",
                 },
             ],
-            type: "STRING",
+            type: ApplicationCommandOptionType.String,
             required: true,
         },
     ],
-    type: "CHAT_INPUT",
+    type: ApplicationCommandType.ChatInput,
 };
 
 async function action(client, interaction) {
