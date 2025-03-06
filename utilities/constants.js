@@ -43,7 +43,7 @@ const MAXIMUM_BUTTON_ROWS = 5;
 /**
  * Regex of characters not allowed in emoji names, such as spaces or periods.
  */
-const DISALLOWED_EMOJI_CHARACTERS_REGEX = /[ .]/g;
+const DISALLOWED_EMOJI_CHARACTERS_REGEX = /[ !?.]/g;
 
 module.exports = {
     GUILDS,
