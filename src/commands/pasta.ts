@@ -1,7 +1,7 @@
-const snoowrap = require("snoowrap");
-const { GUILDS } = require("../utilities/constants.js");
-const auth = require("../auth.json");
-const { ApplicationCommandType } = require("discord.js");
+import snoowrap from "snoowrap";
+import { GUILDS } from "../utilities/constants.js";
+import auth from "../auth.json";
+import { ApplicationCommandType } from "discord.js";
 
 // Reddit Client
 let redditClient;
@@ -32,7 +32,7 @@ const commandData = {
 async function action(client, interaction) {
     const enablePastaCommand = checkAuthorizationHeadersForReddit(auth);
     if (!enablePastaCommand) {
-        console.warning(
+        console.warn(
             "No reddit API credentials provided. Reddit features will not work"
         );
         return;

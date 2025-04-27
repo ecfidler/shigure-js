@@ -1,4 +1,4 @@
-const { getButtonRows, getRoles } = require("../utilities/roleup.js");
+import { getButtonRows, getRoles } from "../utilities/roleup";
 
 async function changeRolesPageEvent(client, interaction) {
     const [category, pageNumber] = interaction.customId.split("_").slice(1);

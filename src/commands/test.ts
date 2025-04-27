@@ -1,7 +1,7 @@
-const {
+import {
     ApplicationCommandType,
     ApplicationCommandOptionType,
-} = require("discord.js");
+} from "discord.js";
 
 const guild = "173840048343482368";
 

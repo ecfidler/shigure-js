@@ -1,11 +1,11 @@
-const {
+import {
     EmbedBuilder,
     ApplicationCommandType,
     ApplicationCommandOptionType,
     Colors,
-} = require("discord.js");
-const { GUILDS } = require("../utilities/constants.js");
-const { getButtonRows, getRoles } = require("../utilities/roleup.js");
+} from "discord.js";
+import { GUILDS } from "../utilities/constants";
+import { getButtonRows, getRoles } from "../utilities/roleup";
 
 const guild = GUILDS.GLOBAL;
 
@@ -37,9 +37,11 @@ const commandData = {
     type: ApplicationCommandType.ChatInput,
 };
 
-const roleMenuHeader = new EmbedBuilder().setColor(Colors.Blurple).setAuthor({
-    name: "Click on a grey role to add it, click on a green role to remove it!",
-}); // TODO: add author icon?
+export const roleMenuHeader = new EmbedBuilder()
+    .setColor(Colors.Blurple)
+    .setAuthor({
+        name: "Click on a grey role to add it, click on a green role to remove it!",
+    }); // TODO: add author icon?
 
 async function action(client, interaction) {
     if (interaction.guild.id !== GUILDS.WHID) {

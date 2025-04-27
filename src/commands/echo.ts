@@ -1,8 +1,8 @@
-const { GUILDS } = require("../utilities/constants.js");
-const {
+import { GUILDS } from "../utilities/constants";
+import {
     ApplicationCommandType,
     ApplicationCommandOptionType,
-} = require("discord.js");
+} from "discord.js";
 
 const guild = GUILDS.WHID;
 

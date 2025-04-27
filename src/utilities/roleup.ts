@@ -1,14 +1,14 @@
-const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
-const {
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
+import {
     BUTTON_ROW_MAX_LENGTH,
     GUILDS,
     MAXIMUM_BUTTON_ROWS,
     DISALLOWED_EMOJI_CHARACTERS_REGEX,
-} = require("./constants");
+} from "./constants";
 
 const MAXROLEROWS = MAXIMUM_BUTTON_ROWS - 1;
 
-function getButtonRows(serverRoles, member, category, page) {
+export function getButtonRows(serverRoles, member, category, page) {
     let rows = [];
 
     serverRoles.sort((a, b) => a.name.localeCompare(b.name));
@@ -87,11 +87,11 @@ function makeRowOfRoles(serverRoles, member) {
     return row;
 }
 
-function hasRole(member, id) {
+export function hasRole(member, id) {
     return member.roles.cache.has(id);
 }
 
-async function getRoles(client, category, guild) {
+export async function getRoles(client, category, guild) {
     const guildRoles = guild.roles.cache;
     const start = guildRoles.find(
         role => role.name === "#Category_" + category

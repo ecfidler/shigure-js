@@ -1,14 +1,9 @@
-const {
+import {
     EmbedBuilder,
     ApplicationCommandType,
     ApplicationCommandOptionType,
-} = require("discord.js");
-const {
-    CHANNELS,
-    GUILDS,
-    EMOJIS,
-    ROLES,
-} = require("../utilities/constants.js");
+} from "discord.js";
+import { CHANNELS, GUILDS, EMOJIS, ROLES } from "../utilities/constants";
 
 const lowlightChannelByGuild = {
     [GUILDS.WHID]: CHANNELS.LOW,

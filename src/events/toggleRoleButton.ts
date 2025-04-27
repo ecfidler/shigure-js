@@ -1,5 +1,5 @@
-const { roleMenuHeader } = require("../commands/roleup");
-const { hasRole } = require("../utilities/roleup");
+import { roleMenuHeader } from "../commands/roleup";
+import { hasRole } from "../utilities/roleup";
 
 async function toggleRoleButtonEvent(client, interaction) {
     // the role id is interaction.customid.split("_")[1];
