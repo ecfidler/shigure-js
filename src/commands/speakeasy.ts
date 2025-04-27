@@ -1,12 +1,11 @@
-const {
+import {
     EmbedBuilder,
     ApplicationCommandType,
     Colors,
     MessageFlags,
-} = require("discord.js");
-const { hasRole } = require("../commands/roleup");
-
-const { GUILDS, ROLES } = require("../utilities/constants.js");
+} from "discord.js";
+import { GUILDS, ROLES } from "../utilities/constants";
+import { hasRole } from "../utilities/roleup";
 
 const guild = GUILDS.YONI;
 

@@ -1,4 +1,4 @@
-const { getButtonRows, getRoles } = require("../utilities/roleup.js");
+import { getButtonRows, getRoles } from "../utilities/roleup";
 
 const { MessageFlags } = require("discord.js");
 
