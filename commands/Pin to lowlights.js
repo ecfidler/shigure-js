@@ -2,6 +2,7 @@ const {
     EmbedBuilder,
     ApplicationCommandType,
     ApplicationCommandOptionType,
+    MessageFlags,
 } = require("discord.js");
 const {
     CHANNELS,
@@ -42,18 +43,19 @@ async function action(client, interaction) {
     ) {
         return;
     }
-    const message = interaction.targetMessage;
-    message.forward(lowlightChannelByGuild[interaction.guildId]);
 
+    const message = interaction.targetMessage;
     const member = await interaction.guild.members.fetch(message.author.id);
+
     await pinMessage(interaction, client, member);
+    message.forward(lowlightChannelByGuild[interaction.guildId]);
 
     await message.react(EMOJIS.PIN);
     await message.reply(`${EMOJIS.PIN} Pinned!`);
 
     await interaction.reply({
         content: "Success!",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
     });
 }
 

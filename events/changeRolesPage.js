@@ -1,5 +1,7 @@
 const { getButtonRows, getRoles } = require("../utilities/roleup.js");
 
+const { MessageFlags } = require("discord.js");
+
 async function changeRolesPageEvent(client, interaction) {
     const [category, pageNumber] = interaction.customId.split("_").slice(1);
 
@@ -13,7 +15,7 @@ async function changeRolesPageEvent(client, interaction) {
     await interaction.update({
         embeds: interaction.embeds,
         components: components,
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
     });
 }
 

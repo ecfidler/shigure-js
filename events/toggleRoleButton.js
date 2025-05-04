@@ -1,6 +1,8 @@
 const { roleMenuHeader } = require("../commands/roleup");
 const { hasRole } = require("../utilities/roleup");
 
+const { MessageFlags } = require("discord.js");
+
 async function toggleRoleButtonEvent(client, interaction) {
     // the role id is interaction.customid.split("_")[1];
     // checks if the member has the role
@@ -26,7 +28,7 @@ async function toggleRoleButtonEvent(client, interaction) {
     await interaction.update({
         embeds: [roleMenuHeader],
         components: interaction.message.components,
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
     });
 }
 

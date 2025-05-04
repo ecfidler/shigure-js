@@ -2,6 +2,7 @@ const { GUILDS } = require("../utilities/constants.js");
 const {
     ApplicationCommandType,
     ApplicationCommandOptionType,
+    MessageFlags,
 } = require("discord.js");
 
 const guild = GUILDS.WHID;
@@ -20,7 +21,10 @@ const commandData = {
 };
 
 async function action(client, interaction) {
-    await interaction.reply({ content: "message echoed!", ephemeral: true });
+    await interaction.reply({
+        content: "message echoed!",
+        flags: MessageFlags.Ephemeral,
+    });
     await interaction.channel.send({
         content: interaction.options.get("content").value,
     });

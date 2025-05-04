@@ -34,16 +34,18 @@ function getButtonRowsWithPages(serverRoles, member, category, page) {
     rows.push(...makeRoleRows(MAXROLEROWS, serverRoles, member));
     rows.push(
         new ActionRowBuilder().addComponents(
-            new ButtonBuilder()
-                .setLabel("<")
-                .setStyle(ButtonStyle.Primary)
-                .setCustomId(`changeRolesPage_${category}_${page - 1}`)
-                .setDisabled(page === 0),
-            new ButtonBuilder()
-                .setLabel(">")
-                .setStyle(ButtonStyle.Primary)
-                .setCustomId(`changeRolesPage_${category}_${page + 1}`)
-                .setDisabled(serverRoles.length === 0)
+            new ButtonBuilder({
+                label: "<",
+                style: ButtonStyle.Primary,
+                custom_id: `changeRolesPage_${category}_${page - 1}`,
+                disabled: page === 0,
+            }),
+            new ButtonBuilder({
+                label: ">",
+                style: ButtonStyle.Primary,
+                custom_id: `changeRolesPage_${category}_${page + 1}`,
+                disabled: serverRoles.length === 0,
+            })
         )
     );
     return rows;
@@ -72,15 +74,14 @@ function makeRowOfRoles(serverRoles, member) {
     while (j < BUTTON_ROW_MAX_LENGTH && serverRoles.length > 0) {
         const role = serverRoles.shift();
         row.addComponents(
-            new ButtonBuilder()
-                .setLabel(role.name)
-                .setStyle(
-                    hasRole(member, role.id)
-                        ? ButtonStyle.Success
-                        : ButtonStyle.Secondary
-                )
-                .setEmoji(role.emoji)
-                .setCustomId(`toggleRoleButton_${role.id}`)
+            new ButtonBuilder({
+                label: role.name,
+                style: hasRole(member, role.id)
+                    ? ButtonStyle.Success
+                    : ButtonStyle.Secondary,
+                emoji: role.emoji,
+                custom_id: `toggleRoleButton_${role.id}`,
+            })
         );
         j++;
     }

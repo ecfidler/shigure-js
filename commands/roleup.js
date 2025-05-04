@@ -3,6 +3,7 @@ const {
     ApplicationCommandType,
     ApplicationCommandOptionType,
     Colors,
+    MessageFlags,
 } = require("discord.js");
 const { GUILDS } = require("../utilities/constants.js");
 const { getButtonRows, getRoles } = require("../utilities/roleup.js");
@@ -45,7 +46,7 @@ async function action(client, interaction) {
     if (interaction.guild.id !== GUILDS.WHID) {
         interaction.reply({
             content: "'roleup' is not availible in this server, sorry.",
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
         });
         return;
     }
@@ -57,7 +58,7 @@ async function action(client, interaction) {
     interaction.reply({
         embeds: [roleMenuHeader],
         components: rows,
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
     });
 }
 

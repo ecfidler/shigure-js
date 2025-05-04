@@ -1,6 +1,7 @@
 const {
     ApplicationCommandType,
     ApplicationCommandOptionType,
+    MessageFlags,
 } = require("discord.js");
 
 const guild = "173840048343482368";
@@ -35,7 +36,7 @@ const commandData = {
 async function action(client, interaction) {
     await interaction.reply({
         content: interaction.options.get("test-type").value + "!",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
     });
 }
 

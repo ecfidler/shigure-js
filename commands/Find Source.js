@@ -3,6 +3,7 @@ const {
     AttachmentBuilder,
     ApplicationCommandType,
     Colors,
+    MessageFlags,
 } = require("discord.js");
 const { CHANNELS, GUILDS } = require("../utilities/constants.js");
 const SauceNAO = require("saucenao");
@@ -44,7 +45,7 @@ async function action(client, interaction) {
         interaction.reply({
             embeds: [errorEmbed("EMPTY")],
             files: [icon],
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
         });
         return;
     }
@@ -61,6 +62,7 @@ async function action(client, interaction) {
             embeds: [errorEmbed(status)],
             files: [icon],
             ephemeral: public,
+            flags: public ? [] : MessageFlags.Ephemeral,
         });
         return;
     }
@@ -68,7 +70,7 @@ async function action(client, interaction) {
     interaction.reply({
         embeds: [formatSauce(saucePayload, objective)],
         files: [icon],
-        ephemeral: public,
+        flags: public ? [] : MessageFlags.Ephemeral,
     });
 }
 

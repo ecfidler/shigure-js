@@ -1,4 +1,9 @@
-const { EmbedBuilder, ApplicationCommandType, Colors } = require("discord.js");
+const {
+    EmbedBuilder,
+    ApplicationCommandType,
+    Colors,
+    MessageFlags,
+} = require("discord.js");
 const { hasRole } = require("../commands/roleup");
 
 const { GUILDS, ROLES } = require("../utilities/constants.js");
@@ -21,7 +26,7 @@ async function action(client, interaction) {
                     "Removed the Connoisseur role.\nYou can no longer view the Speakeasy category."
                 ),
             ],
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
         });
     } else {
         await interaction.member.roles.add(ROLES.NSFW);
@@ -31,7 +36,7 @@ async function action(client, interaction) {
                     "Added the Connoisseur role.\nYou can now view the Speakeasy category."
                 ),
             ],
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
         });
     }
 }
