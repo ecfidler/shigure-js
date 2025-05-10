@@ -2,10 +2,10 @@
     "name": "shigure",
     "version": "1.0.0",
     "description": "discord.js rewrite of my discord.py bot shigure",
-    "main": "index.ts",
+    "main": "src/index.ts",
     "scripts": {
-        "dev": "tsx watch index.ts",
-        "start": "tsx index.ts"
+        "dev": "tsx watch src/index.ts",
+        "start": "tsx src/index.ts"
     },
     "repository": {
         "type": "git",
