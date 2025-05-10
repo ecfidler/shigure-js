@@ -6,8 +6,10 @@ import {
     MessageFlags,
 } from "discord.js";
 import { CHANNELS, GUILDS } from "../utilities/constants";
+// TODO: Replace SauceNAO with sagiri for type safety
 import SauceNAO from "saucenao";
 import auth from "../auth.json";
+import type { CommandArgs } from "../types/CommandArgs";
 
 //const fs = require(`fs`); // TESTING ONLY
 
@@ -23,24 +25,39 @@ const SAUCE_NAO_AUTHOR = {
 // Attachments
 const icon = new AttachmentBuilder("./assets/images/icon.png");
 
-const guild = GUILDS.GLOBAL;
+export const guild = GUILDS.GLOBAL;
 
-const commandData = {
+export const commandData = {
     type: ApplicationCommandType.Message,
 };
 
-async function action(client, interaction) {
-    let isPublic = !(
-        interaction.channel.id == CHANNELS.FINDER ||
-        interaction.guild.id != GUILDS.YONI
+export async function action({ interaction }: CommandArgs) {
+    if (!interaction.isMessageContextMenuCommand()) {
+        console.error("Unexpected interaction type");
+        return;
+    }
+
+    if (interaction.guild == null) {
+        console.error("Interaction called with no guild");
+        return;
+    }
+
+    if (interaction.channel == null) {
+        console.error("Interaction called with no channel");
+        return;
+    }
+
+    const isPublic = !(
+        interaction.channel.id === CHANNELS.FINDER ||
+        interaction.guild.id !== GUILDS.YONI
     );
-    let msg = await interaction.channel.messages.fetch({
+    const msg = await interaction.channel?.messages.fetch({
         message: interaction.targetId,
     });
-    let attch = msg.attachments;
-    console.log(attch);
+    const { attachments } = msg;
+    const objective = attachments.last()?.url;
 
-    if (attch.size == 0) {
+    if (objective == null) {
         // When there is no image on target message
         interaction.reply({
             embeds: [errorEmbed("EMPTY")],
@@ -50,9 +67,9 @@ async function action(client, interaction) {
         return;
     }
 
-    let objective = attch.last().url;
-    let saucePayload = (await sauceFinder(objective)).json;
-    let status = saucePayload.header.status;
+    // TODO: Replace SauceNAO with sagiri for type safety
+    const saucePayload = (await sauceFinder(objective)).json;
+    const status = saucePayload.header.status;
 
     //fs.writeFileSync(`sauceData.json`, JSON.stringify(saucePayload, null, 2)); // TESTING ONLY
 
@@ -73,20 +90,20 @@ async function action(client, interaction) {
     });
 }
 
-function formatSauce(payload, thumbnail) {
+function formatSauce(payload: any, thumbnail: string) {
     const sauce = new EmbedBuilder()
         .setTitle("Source(s) found:")
         .setColor(Colors.Blurple)
         .setAuthor(SAUCE_NAO_AUTHOR)
         .setThumbnail(thumbnail)
         .setFooter({
-            text: "Results pulled from SauceNAO, contact @fops#1984 for assistance",
+            text: "Results pulled from SauceNAO, contact @fops for assistance",
             // TODO: This icon URL is broken. Find a new one.
             iconURL:
                 "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/twitter/282/steaming-bowl_1f35c.png",
         });
 
-    payload.results.forEach(result => {
+    payload.results.forEach((result: any) => {
         if (parseInt(result.header.similarity) > 55) {
             // Only want results with similarity > 55
 
@@ -100,7 +117,10 @@ function formatSauce(payload, thumbnail) {
                     content += `\n [Link to Post](${result.data.ext_urls[0]})`;
                 }
 
-                sauce.addFields([title, content]);
+                sauce.addFields([
+                    { name: "title", value: title },
+                    { name: "content", value: content },
+                ]);
             }
 
             if (idx == 41) {
@@ -116,7 +136,10 @@ function formatSauce(payload, thumbnail) {
                     content += `\n [Link to Post](${result.data.ext_urls[0]})`;
                 }
 
-                sauce.addFields([title, content]);
+                sauce.addFields([
+                    { name: "title", value: title },
+                    { name: "content", value: content },
+                ]);
             }
 
             if (idx == 9) {
@@ -135,51 +158,58 @@ function formatSauce(payload, thumbnail) {
                 }
                 if (result.data?.ext_urls) {
                     content += "**Link(s):**\n";
-                    result.data.ext_urls.forEach(link => {
+                    result.data.ext_urls.forEach((link: any) => {
                         content += formatLink(link);
                     });
                 }
 
-                sauce.addFields([title, content]);
+                sauce.addFields([
+                    { name: "title", value: title },
+                    { name: "content", value: content },
+                ]);
             }
         }
     });
 
-    if (sauce.fields.length == 0) {
+    if (sauce.data.fields?.length == 0) {
         sauce.addFields([
-            "No accurate sources found...",
-            "Try checking on the [main website](https://saucenao.com/) in the case of an error",
+            { name: "error", value: "No accurate sources found..." },
+            {
+                name: "action",
+                value: "Try checking on the [main website](https://saucenao.com/) in the case of an error",
+            },
         ]);
     }
 
     return sauce;
 }
 
-function errorEmbed(code) {
-    const text = code > 0 ? "Server" : "Client";
-
+function errorEmbed(code: number | "EMPTY") {
     const err = new EmbedBuilder()
         .setTitle("Error")
         .setColor(Colors.Red)
         .setAuthor(SAUCE_NAO_AUTHOR)
-        .setDescription(`${text} error, Code: ${code}`)
         .setFooter({
-            text: "Contact @fops#1984 for assistance",
+            text: "Contact @fops for assistance",
             // TODO: This icon URL is broken. Find a new one.
             iconURL:
                 "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/twitter/282/exclamation-mark_2757.png",
         });
 
-    if (code == "EMPTY") {
+    if (code === "EMPTY") {
         err.setDescription("No image found in message");
+    } else {
+        const text = code > 0 ? "Server" : "Client";
+        err.setDescription(`${text} error, Code: ${code}`);
     }
 
     return err;
 }
 
-function formatLink(link) {
-    const name = link.split("https://")[1].split("/")[0];
-    return `[${name}](${link})\n`;
+function formatLink(link: string) {
+    const baseUrl = link.split("https://")[1]?.split("/")[0];
+    if (baseUrl == null) {
+        throw new Error("Invalid URL");
+    }
+    return `[${baseUrl}](${link})\n`;
 }
-
-module.exports = { commandData, action, guild };

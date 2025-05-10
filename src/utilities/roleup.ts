@@ -1,39 +1,75 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
 import {
-    BUTTON_ROW_MAX_LENGTH,
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle,
+    Client,
+    Guild,
+    GuildEmoji,
+    GuildEmojiManager,
+    GuildMember,
+    Role,
+    type APIMessageComponentEmoji,
+    type ComponentEmojiResolvable,
+} from "discord.js";
+import {
+    MAX_BUTTONS_IN_ROW,
     GUILDS,
-    MAXIMUM_BUTTON_ROWS,
+    MAX_BUTTON_ROWS,
     DISALLOWED_EMOJI_CHARACTERS_REGEX,
 } from "./constants";
 
-const MAXROLEROWS = MAXIMUM_BUTTON_ROWS - 1;
+const MAX_ROLE_ROWS = MAX_BUTTON_ROWS - 1;
+const MAX_ROLES_PER_PAGE = MAX_BUTTONS_IN_ROW * MAX_ROLE_ROWS;
 
-export function getButtonRows(serverRoles, member, category, page) {
-    let rows = [];
+interface RoleAndEmoji {
+    readonly role: Role;
+    readonly emoji: GuildEmoji | string | undefined;
+}
 
-    serverRoles.sort((a, b) => a.name.localeCompare(b.name));
+export function getButtonRows(
+    serverRoles: readonly RoleAndEmoji[],
+    member: GuildMember,
+    category: string,
+    page: number
+) {
+    const sortedRoles = [...serverRoles].sort((a, b) =>
+        a.role.name.localeCompare(b.role.name)
+    );
 
-    if (serverRoles.length <= MAXIMUM_BUTTON_ROWS * BUTTON_ROW_MAX_LENGTH) {
-        rows = getButtonRowsWithoutPages(serverRoles, member);
-    } else {
-        rows = getButtonRowsWithPages(serverRoles, member, category, page);
+    if (sortedRoles.length > MAX_BUTTON_ROWS * MAX_BUTTONS_IN_ROW) {
+        return getButtonRowsWithPages(sortedRoles, member, category, page);
     }
 
+    return getButtonRowsWithoutPages(sortedRoles, member);
+}
+
+function getButtonRowsWithoutPages(
+    serverRoles: readonly RoleAndEmoji[],
+    member: GuildMember
+) {
+    const rows = [];
+    rows.push(...makeRoleRows(MAX_BUTTON_ROWS, serverRoles, member));
     return rows;
 }
 
-function getButtonRowsWithoutPages(serverRoles, member) {
+function getButtonRowsWithPages(
+    allRoles: readonly RoleAndEmoji[],
+    member: GuildMember,
+    category: string,
+    page: number
+) {
     const rows = [];
-    rows.push(...makeRoleRows(MAXIMUM_BUTTON_ROWS, serverRoles, member));
-    return rows;
-}
 
-function getButtonRowsWithPages(serverRoles, member, category, page) {
-    const rows = [];
-    moveToPage(page, serverRoles);
-    rows.push(...makeRoleRows(MAXROLEROWS, serverRoles, member));
+    const numPages = Math.ceil(allRoles.length / MAX_ROLES_PER_PAGE);
+
+    const rolesOnPage = allRoles.slice(
+        page * MAX_ROLES_PER_PAGE,
+        (page + 1) * MAX_ROLES_PER_PAGE
+    );
+
+    rows.push(...makeRoleRows(MAX_ROLE_ROWS, rolesOnPage, member));
     rows.push(
-        new ActionRowBuilder().addComponents(
+        new ActionRowBuilder<ButtonBuilder>().addComponents(
             new ButtonBuilder({
                 label: "<",
                 style: ButtonStyle.Primary,
@@ -44,55 +80,54 @@ function getButtonRowsWithPages(serverRoles, member, category, page) {
                 label: ">",
                 style: ButtonStyle.Primary,
                 custom_id: `changeRolesPage_${category}_${page + 1}`,
-                disabled: serverRoles.length === 0,
+                disabled: page + 1 === numPages,
             })
         )
     );
     return rows;
 }
 
-function moveToPage(page, serverRoles) {
-    if (page > 0) {
-        serverRoles.splice(0, page * BUTTON_ROW_MAX_LENGTH * MAXROLEROWS);
-    }
-}
-
-function makeRoleRows(numRows, serverRoles, member) {
+function makeRoleRows(
+    numRows: number,
+    roles: readonly RoleAndEmoji[],
+    member: GuildMember
+) {
     const rows = [];
     let i = 0;
-    while (i < numRows && serverRoles.length > 0) {
-        const row = makeRowOfRoles(serverRoles, member);
+    while (i < numRows && i * MAX_BUTTONS_IN_ROW < roles.length) {
+        const rolesInRow = roles.slice(
+            i * MAX_BUTTONS_IN_ROW,
+            (i + 1) * MAX_BUTTONS_IN_ROW
+        );
+        const row = makeRowOfRoles(rolesInRow, member);
         rows.push(row);
         i++;
     }
     return rows;
 }
 
-function makeRowOfRoles(serverRoles, member) {
-    const row = new ActionRowBuilder();
-    let j = 0;
-    while (j < BUTTON_ROW_MAX_LENGTH && serverRoles.length > 0) {
-        const role = serverRoles.shift();
+function makeRowOfRoles(roles: readonly RoleAndEmoji[], member: GuildMember) {
+    const row = new ActionRowBuilder<ButtonBuilder>();
+    for (const role of roles) {
         row.addComponents(
             new ButtonBuilder({
-                label: role.name,
-                style: hasRole(member, role.id)
+                label: role.role.name,
+                style: hasRole(member, role.role.id)
                     ? ButtonStyle.Success
                     : ButtonStyle.Secondary,
-                emoji: role.emoji,
-                custom_id: `toggleRoleButton_${role.id}`,
+                emoji: convertGuildEmojiToButtonEmoji(role.emoji),
+                custom_id: `toggleRoleButton_${role.role.id}`,
             })
         );
-        j++;
     }
     return row;
 }
 
-export function hasRole(member, id) {
+export function hasRole(member: GuildMember, id: string) {
     return member.roles.cache.has(id);
 }
 
-export async function getRoles(client, category, guild) {
+export async function getRoles(client: Client, category: string, guild: Guild) {
     const guildRoles = guild.roles.cache;
     const start = guildRoles.find(
         role => role.name === "#Category_" + category
@@ -100,48 +135,82 @@ export async function getRoles(client, category, guild) {
     const end = guildRoles.find(
         role => role.name === "#EndCategory_" + category
     );
-    const existingEmojis = client.guilds.cache.get(GUILDS.ROLE).emojis;
-    const roles = [];
+    if (start == null || end == null) {
+        console.error(
+            `Could not determine the start and end of role category ${category}`
+        );
+        return [];
+    }
 
-    guildRoles.each(role => {
+    const roleEmojiServerManager = client.guilds.cache.get(GUILDS.ROLE)?.emojis;
+    const roles: Role[] = [];
+
+    for (const role of guildRoles.values()) {
         if (
             role.comparePositionTo(start) < 0 &&
             role.comparePositionTo(end) > 0
         ) {
             roles.push(role);
-            console.log(role.name);
         }
-    });
-
-    await getOrMakeRoleEmojis(existingEmojis, roles);
-
-    return roles;
-}
-
-async function getOrMakeRoleEmojis(guildEmojis, roles) {
-    for (const role of roles) {
-        role.emoji = await resolveRoleEmoji(guildEmojis, role);
     }
+
+    // Side effect
+    const rolesWithEmoji = await getOrMakeRoleEmojis(
+        roleEmojiServerManager,
+        roles
+    );
+
+    return rolesWithEmoji;
 }
 
-async function resolveRoleEmoji(guildEmojis, role) {
+async function getOrMakeRoleEmojis(
+    roleEmojiServerManager: GuildEmojiManager | undefined,
+    roles: readonly Role[]
+): Promise<RoleAndEmoji[]> {
+    const rolesWithEmoji: RoleAndEmoji[] = await Promise.all(
+        roles.map(
+            async (role): Promise<RoleAndEmoji> => ({
+                role,
+                emoji: await resolveRoleEmoji(roleEmojiServerManager, role),
+            })
+        )
+    );
+    return rolesWithEmoji;
+}
+
+async function resolveRoleEmoji(
+    roleEmojiServerManager: GuildEmojiManager | undefined,
+    role: Role
+) {
+    if (roleEmojiServerManager == null) {
+        return undefined;
+    }
+
     if (role.unicodeEmoji != null) {
         // e.g. "💩"
         return role.unicodeEmoji;
     }
 
+    // TODO: Support custom guild emoji as icon
+
     if (role.icon == null) {
-        return null;
+        return undefined;
     }
 
-    const customRoleEmoji = await getCustomRoleEmoji(guildEmojis, role);
+    const customRoleEmoji = await getCustomRoleEmoji(
+        roleEmojiServerManager,
+        role
+    );
 
     if (customRoleEmoji != null) {
         return customRoleEmoji;
     }
 
-    await makeCustomRoleEmoji(guildEmojis, role);
-    const newCustomRoleEmoji = await getCustomRoleEmoji(guildEmojis, role);
+    await makeCustomRoleEmoji(roleEmojiServerManager, role);
+    const newCustomRoleEmoji = await getCustomRoleEmoji(
+        roleEmojiServerManager,
+        role
+    );
 
     if (newCustomRoleEmoji != null) {
         return newCustomRoleEmoji;
@@ -150,21 +219,53 @@ async function resolveRoleEmoji(guildEmojis, role) {
     throw new Error(`Could not create emoji for role ${role.name}`);
 }
 
-async function getCustomRoleEmoji(emojis, role) {
-    return emojis.cache.find(emoji => emoji.name === emojify(role.name));
+async function getCustomRoleEmoji(
+    roleEmojiServerManager: GuildEmojiManager,
+    role: Role
+) {
+    return roleEmojiServerManager.cache.find(
+        emoji => emoji.name === emojify(role.name)
+    );
 }
 
-async function makeCustomRoleEmoji(emojis, role) {
-    let url = makeEmojiURL(role);
-    await emojis.create(url, emojify(role.name));
+async function makeCustomRoleEmoji(
+    roleEmojiServerManager: GuildEmojiManager,
+    role: Role
+) {
+    await roleEmojiServerManager.create({
+        attachment: getEmojiUrlForRole(role),
+        name: emojify(role.name),
+    });
 }
 
-function makeEmojiURL(role) {
+function getEmojiUrlForRole(role: Role) {
     return `https://cdn.discordapp.com/role-icons/${role.id}/${role.icon}.png`;
 }
 
-function emojify(text) {
+function emojify(text: string) {
     return text.replaceAll(DISALLOWED_EMOJI_CHARACTERS_REGEX, "_");
+}
+
+function convertGuildEmojiToButtonEmoji(
+    emoji: string | GuildEmoji | undefined
+): APIMessageComponentEmoji | undefined {
+    if (emoji instanceof GuildEmoji) {
+        return {
+            animated: emoji.animated ?? undefined,
+            name: emoji.name ?? undefined,
+            id: emoji.id,
+        };
+    }
+
+    if (emoji == null) {
+        return undefined;
+    }
+
+    return {
+        animated: false,
+        name: emoji,
+        id: emoji,
+    };
 }
 
 module.exports = {

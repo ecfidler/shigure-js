@@ -3,16 +3,28 @@ import {
     ApplicationCommandType,
     ApplicationCommandOptionType,
     MessageFlags,
+    ChatInputCommandInteraction,
+    Client,
+    GuildMember,
+    MessageContextMenuCommandInteraction,
+    Message,
+    TextChannel,
+    type GuildBasedChannel,
+    type TextBasedChannel,
+    type SendableChannels,
 } from "discord.js";
 import { CHANNELS, GUILDS, EMOJIS, ROLES } from "../utilities/constants";
+import type { CommandArgs } from "../types/CommandArgs";
+import { guild } from "./Find Source";
 
 const lowlightChannelByGuild = {
     [GUILDS.WHID]: CHANNELS.LOW,
     [GUILDS.BEN_TESTING]: CHANNELS.LOW_TEST,
 };
-const guilds = Object.keys(lowlightChannelByGuild);
 
-const commandData = {
+export const guilds = Object.keys(lowlightChannelByGuild);
+
+export const commandData = {
     defaultPermission: false,
     permissions: [
         // whid
@@ -31,19 +43,41 @@ const commandData = {
     type: ApplicationCommandType.Message,
 };
 
-async function action(client, interaction) {
+export async function action({ client, interaction }: CommandArgs) {
     if (
         !interaction.isMessageContextMenuCommand() ||
-        interaction.guildId == null
+        interaction.guildId == null ||
+        interaction.guild == null
     ) {
         return;
     }
 
-    const message = interaction.targetMessage;
-    const member = await interaction.guild.members.fetch(message.author.id);
+    const lowlightsChannelId = lowlightChannelByGuild[interaction.guildId];
+    if (lowlightsChannelId == null) {
+        console.error(
+            `Lowlights channel not configured for guild ${interaction.guild.name}`
+        );
+        return;
+    }
+    const lowlightsChannel = client.channels.cache.get(lowlightsChannelId);
+    if (lowlightsChannel == null) {
+        console.error(
+            `Lowlights channel with id ${lowlightsChannelId} not found in guild ${interaction.guild.name}`
+        );
+        return;
+    }
+    if (!lowlightsChannel.isSendable()) {
+        console.error(
+            `Lowlights channel with id ${lowlightsChannelId} in guild ${interaction.guild.name} is not a text channel`
+        );
+        return;
+    }
 
-    await pinMessage(interaction, client, member);
-    message.forward(lowlightChannelByGuild[interaction.guildId]);
+    const message = interaction.targetMessage;
+    const author = await interaction.guild.members.fetch(message.author.id);
+
+    // TODO: Use message components
+    await pinMessage(author, message, lowlightsChannel);
 
     await message.react(EMOJIS.PIN);
     await message.reply(`${EMOJIS.PIN} Pinned!`);
@@ -54,21 +88,25 @@ async function action(client, interaction) {
     });
 }
 
-async function pinMessage(interaction, client, member) {
-    await client.channels.cache
-        .get(lowlightChannelByGuild[interaction.guildId])
-        .send({
-            embeds: [
-                new EmbedBuilder().setColor(member.displayHexColor).setFooter({
-                    text: `${member.displayName}`,
-                    iconURL: member.user.displayAvatarURL(),
-                }),
-            ],
-        });
+async function pinMessage(
+    author: GuildMember,
+    message: Message,
+    lowlightsChannel: SendableChannels
+) {
+    await sendAuthorshipEmbed(lowlightsChannel, author);
+    message.forward(lowlightsChannel);
 }
 
-module.exports = {
-    commandData,
-    action,
-    guilds,
-};
+async function sendAuthorshipEmbed(
+    lowlightsChannel: SendableChannels,
+    member: GuildMember
+) {
+    await lowlightsChannel.send({
+        embeds: [
+            new EmbedBuilder().setColor(member.displayHexColor).setFooter({
+                text: `${member.displayName}`,
+                iconURL: member.user.displayAvatarURL(),
+            }),
+        ],
+    });
+}

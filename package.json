@@ -2,7 +2,7 @@
     "name": "shigure",
     "version": "1.0.0",
     "description": "discord.js rewrite of my discord.py bot shigure",
-    "main": "index.js",
+    "main": "index.ts",
     "scripts": {
         "dev": "tsx watch index.ts",
         "start": "tsx index.ts"
@@ -32,11 +32,13 @@
         "utf-8-validate": "^5.0.9"
     },
     "devDependencies": {
-        "eslint": "^7.32.0",
+        "@eslint/js": "^9.26.0",
+        "eslint": "^9.26.0",
         "eslint-config-prettier": "^8.5.0",
         "prettier": "2.7.1",
         "tsx": "^4.19.3",
-        "typescript": "^5.8.3"
+        "typescript": "^5.8.3",
+        "typescript-eslint": "^8.32.0"
     },
     "prettier": {
         "tabWidth": 4,

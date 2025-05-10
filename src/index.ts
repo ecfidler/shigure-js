@@ -31,23 +31,23 @@ client.on("interactionCreate", interaction => {
     if (interaction.isCommand()) {
         commandManager.commandByCommandName
             .get(interaction.commandName)
-            .action(client, interaction);
+            .action({ client, interaction });
         return;
     }
 
     if (interaction.isContextMenuCommand()) {
         commandManager.commandByCommandName
             .get(interaction.commandName)
-            .action(client, interaction);
+            .action({ client, interaction });
         return;
     }
 
     if (interaction.isButton()) {
         if (interaction.customId.startsWith("toggleRoleButton_")) {
             // pass the interaction into a function to sort out the issues
-            toggleRoleButtonEvent(client, interaction);
+            toggleRoleButtonEvent({ client, interaction });
         } else if (interaction.customId.startsWith("changeRolesPage_")) {
-            changeRolesPageEvent(client, interaction);
+            changeRolesPageEvent({ client, interaction });
         }
         return;
     }

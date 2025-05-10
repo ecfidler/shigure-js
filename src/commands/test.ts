@@ -3,10 +3,11 @@ import {
     ApplicationCommandOptionType,
     MessageFlags,
 } from "discord.js";
+import type { CommandArgs } from "../types/CommandArgs";
 
-const guild = "173840048343482368";
+export const guild = "173840048343482368";
 
-const commandData = {
+export const commandData = {
     description: "call and response",
     options: [
         {
@@ -33,11 +34,26 @@ const commandData = {
     type: ApplicationCommandType.ChatInput,
 };
 
-async function action(client, interaction) {
+export async function action({ interaction }: CommandArgs) {
+    if (
+        !interaction.isChatInputCommand() ||
+        interaction.guildId == null ||
+        interaction.guild == null ||
+        interaction.options == null
+    ) {
+        return;
+    }
+
+    const category = interaction.options.get("test-type")?.value;
+    if (category == null) {
+        interaction.reply({
+            content: "Please choose a category",
+            flags: MessageFlags.Ephemeral,
+        });
+        return;
+    }
     await interaction.reply({
-        content: interaction.options.get("test-type").value + "!",
+        content: category + "!",
         flags: MessageFlags.Ephemeral,
     });
 }
-
-module.exports = { commandData, action, guild };

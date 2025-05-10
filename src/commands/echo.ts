@@ -1,13 +1,15 @@
+import type { CommandArgs } from "../types/CommandArgs";
 import { GUILDS } from "../utilities/constants";
 import {
     ApplicationCommandType,
     ApplicationCommandOptionType,
     MessageFlags,
+    ChannelType,
 } from "discord.js";
 
-const guild = GUILDS.WHID;
+export const guild = GUILDS.WHID;
 
-const commandData = {
+export const commandData = {
     description: "call and replay",
     options: [
         {
@@ -20,14 +22,25 @@ const commandData = {
     type: ApplicationCommandType.ChatInput,
 };
 
-async function action(client, interaction) {
+export async function action({ interaction }: CommandArgs) {
+    if (!interaction.isChatInputCommand()) {
+        console.error("Unexpected interaction type");
+        return;
+    }
+
     await interaction.reply({
         content: "message echoed!",
         flags: MessageFlags.Ephemeral,
     });
-    await interaction.channel.send({
-        content: interaction.options.get("content").value,
+    const { channel } = interaction;
+    if (
+        channel?.type !== ChannelType.GuildText &&
+        channel?.type !== ChannelType.GuildVoice
+    ) {
+        return;
+    }
+
+    await channel.send({
+        content: interaction.options.get("content")?.toString(),
     });
 }
-
-module.exports = { commandData, action, guild };

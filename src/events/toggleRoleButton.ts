@@ -1,34 +1,66 @@
+import {
+    ActionRow,
+    ButtonBuilder,
+    ButtonComponent,
+    ButtonStyle,
+    ComponentType,
+    MessageFlags,
+    type APIButtonComponent,
+    type MessageActionRowComponent,
+    type TopLevelComponent,
+} from "discord.js";
 import { roleMenuHeader } from "../commands/roleup";
+import type { CommandArgs } from "../types/CommandArgs";
+import { isMemberCached } from "../utilities/isMemberCached";
 import { hasRole } from "../utilities/roleup";
 
-const { MessageFlags } = require("discord.js");
-
-async function toggleRoleButtonEvent(client, interaction) {
-    // the role id is interaction.customid.split("_")[1];
-    // checks if the member has the role
-    // gives or removes it
-    // edits the original message by updating it
+async function toggleRoleButtonEvent({ interaction }: CommandArgs) {
+    if (!interaction.isButton() || !isMemberCached(interaction.member)) {
+        return;
+    }
 
     const roleId = interaction.customId.split("_")[1];
-    const has = hasRole(interaction.member, roleId);
+    if (roleId == null) {
+        console.error("Invalid row selection");
+        return;
+    }
 
-    if (has) {
+    const memberHasRole = hasRole(interaction.member, roleId);
+    if (memberHasRole) {
         await interaction.member.roles.remove(roleId);
     } else {
         await interaction.member.roles.add(roleId);
     }
-    for (let row of interaction.message.components) {
-        let button = row.components.find(
-            button => button.customId === interaction.customId
-        );
-        if (button) {
-            button.setStyle(has ? "SECONDARY" : "SUCCESS");
+
+    const newComponents: TopLevelComponent[] = [];
+    for (const row of interaction.message.components) {
+        if (row.type !== ComponentType.ActionRow) {
+            newComponents.push(row);
+            continue;
+        }
+
+        const actions: MessageActionRowComponent[] = [];
+        for (const action of row.components) {
+            if (
+                action.type !== ComponentType.Button ||
+                action.customId !== interaction.customId
+            ) {
+                actions.push(action);
+                continue;
+            }
+
+            actions.push({
+                ...action,
+                style: memberHasRole
+                    ? ButtonStyle.Secondary
+                    : ButtonStyle.Success,
+            } as ButtonComponent);
         }
     }
+
     await interaction.update({
         embeds: [roleMenuHeader],
-        components: interaction.message.components,
-        flags: MessageFlags.Ephemeral,
+        components: newComponents,
     });
 }
 
