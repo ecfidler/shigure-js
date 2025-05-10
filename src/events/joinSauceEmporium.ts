@@ -1,4 +1,4 @@
-const { CHANNELS, ROLES, OWNER } = require("../utilities/constants.js");
+import { CHANNELS, ROLES, OWNER } from "../utilities/constants";
 
 async function joinSauceEmporiumEvent(member) {
     const moderator = await member.guild.members.fetch(OWNER);

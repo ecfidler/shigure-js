@@ -1,13 +1,13 @@
-const {
+import {
     EmbedBuilder,
     AttachmentBuilder,
     ApplicationCommandType,
     Colors,
     MessageFlags,
-} = require("discord.js");
-const { CHANNELS, GUILDS } = require("../utilities/constants.js");
-const SauceNAO = require("saucenao");
-const auth = require("../auth.json");
+} from "discord.js";
+import { CHANNELS, GUILDS } from "../utilities/constants";
+import SauceNAO from "saucenao";
+import auth from "../auth.json";
 
 //const fs = require(`fs`); // TESTING ONLY
 
@@ -30,7 +30,7 @@ const commandData = {
 };
 
 async function action(client, interaction) {
-    let public = !(
+    let isPublic = !(
         interaction.channel.id == CHANNELS.FINDER ||
         interaction.guild.id != GUILDS.YONI
     );
@@ -61,8 +61,7 @@ async function action(client, interaction) {
         interaction.reply({
             embeds: [errorEmbed(status)],
             files: [icon],
-            ephemeral: public,
-            flags: public ? [] : MessageFlags.Ephemeral,
+            flags: isPublic ? [] : MessageFlags.Ephemeral,
         });
         return;
     }
@@ -70,7 +69,7 @@ async function action(client, interaction) {
     interaction.reply({
         embeds: [formatSauce(saucePayload, objective)],
         files: [icon],
-        flags: public ? [] : MessageFlags.Ephemeral,
+        flags: isPublic ? [] : MessageFlags.Ephemeral,
     });
 }
 

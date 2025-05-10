@@ -1,5 +1,5 @@
-const { roleMenuHeader } = require("../commands/roleup");
-const { hasRole } = require("../utilities/roleup");
+import { roleMenuHeader } from "../commands/roleup";
+import { hasRole } from "../utilities/roleup";
 
 const { MessageFlags } = require("discord.js");
 
