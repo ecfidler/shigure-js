@@ -1,13 +1,14 @@
 import {
-    ApplicationCommandType,
     ApplicationCommandOptionType,
+    ApplicationCommandType,
     MessageFlags,
 } from "discord.js";
 import type { CommandArgs } from "../types/CommandArgs";
+import type { CommandData } from "../types/CommandData";
 
 export const guild = "173840048343482368";
 
-export const commandData = {
+export const commandData: CommandData = {
     description: "call and response",
     options: [
         {
@@ -46,7 +47,7 @@ export async function action({ interaction }: CommandArgs) {
 
     const category = interaction.options.get("test-type")?.value;
     if (category == null) {
-        interaction.reply({
+        await interaction.reply({
             content: "Please choose a category",
             flags: MessageFlags.Ephemeral,
         });

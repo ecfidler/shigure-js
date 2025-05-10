@@ -8,13 +8,15 @@ import {
 import { CHANNELS, GUILDS } from "../utilities/constants";
 // TODO: Replace SauceNAO with sagiri for type safety
 import SauceNAO from "saucenao";
-import auth from "../auth.json";
 import type { CommandArgs } from "../types/CommandArgs";
+import type { CommandData } from "../types/CommandData";
+import { auth } from "../auth";
 
 //const fs = require(`fs`); // TESTING ONLY
 
 // Setup Sauce finder
-const sauceFinder = new SauceNAO(auth["SauceNAO-key"]);
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+const sauceFinder = new SauceNAO(auth.SauceNAOkey);
 
 const SAUCE_NAO_AUTHOR = {
     name: "SauceNAO",
@@ -27,7 +29,7 @@ const icon = new AttachmentBuilder("./assets/images/icon.png");
 
 export const guild = GUILDS.GLOBAL;
 
-export const commandData = {
+export const commandData: CommandData = {
     type: ApplicationCommandType.Message,
 };
 
@@ -59,7 +61,7 @@ export async function action({ interaction }: CommandArgs) {
 
     if (objective == null) {
         // When there is no image on target message
-        interaction.reply({
+        await interaction.reply({
             embeds: [errorEmbed("EMPTY")],
             files: [icon],
             flags: MessageFlags.Ephemeral,
@@ -75,7 +77,7 @@ export async function action({ interaction }: CommandArgs) {
 
     if (status) {
         // Error Returned
-        interaction.reply({
+        await interaction.reply({
             embeds: [errorEmbed(status)],
             files: [icon],
             flags: isPublic ? [] : MessageFlags.Ephemeral,
@@ -83,7 +85,7 @@ export async function action({ interaction }: CommandArgs) {
         return;
     }
 
-    interaction.reply({
+    await interaction.reply({
         embeds: [formatSauce(saucePayload, objective)],
         files: [icon],
         flags: isPublic ? [] : MessageFlags.Ephemeral,

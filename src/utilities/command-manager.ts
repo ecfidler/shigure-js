@@ -1,22 +1,32 @@
+import type { Client, CommandInteractionResolvedData, Permissions } from "discord.js";
 import fs from "fs";
 import path from "path";
+import type { CommandArgs } from "../types/CommandArgs";
+import type { CommandData } from "../types/CommandData";
 
-const commandByCommandName = new Map();
+interface CommandModule {
+  readonly guild?: string;
+  readonly guilds?: string;
+  readonly action: (args: CommandArgs) => void;
+  readonly name: string;
+  readonly commandData: CommandData;
+}
 
-module.exports = { loadCommands, commandByCommandName };
+export const commandByCommandName = new Map<string, CommandModule>();
 
-async function loadCommands(client) {
+export async function loadCommands(client: Client) {
     console.info("Loading commands...");
-    const commands = fs.readdirSync("./commands");
+    const commandFilenames = fs.readdirSync("./commands");
 
     const globalCommands = [];
     const specializedCommandsByGuildId = new Map();
-    for (let i = 0; i < commands.length; i++) {
-        const commandName = path.basename(commands[i], ".js");
+    for (const commandFilename of commandFilenames) {
+        const commandName = path.basename(commandFilename, ".ts");
         commandByCommandName.set(
             commandName,
-            require("../commands/" + commands[i])
+            await import ("../commands/" + commandFilename)
         );
+        
         const command = commandByCommandName.get(commandName);
         if (!command.commandData.name) {
             command.commandData.name = commandName;

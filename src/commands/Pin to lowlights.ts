@@ -1,21 +1,15 @@
 import {
-    EmbedBuilder,
-    ApplicationCommandType,
     ApplicationCommandOptionType,
-    MessageFlags,
-    ChatInputCommandInteraction,
-    Client,
+    ApplicationCommandType,
+    EmbedBuilder,
     GuildMember,
-    MessageContextMenuCommandInteraction,
     Message,
-    TextChannel,
-    type GuildBasedChannel,
-    type TextBasedChannel,
+    MessageFlags,
     type SendableChannels,
 } from "discord.js";
-import { CHANNELS, GUILDS, EMOJIS, ROLES } from "../utilities/constants";
 import type { CommandArgs } from "../types/CommandArgs";
-import { guild } from "./Find Source";
+import type { CommandData } from "../types/CommandData";
+import { CHANNELS, EMOJIS, GUILDS, ROLES } from "../utilities/constants";
 
 const lowlightChannelByGuild = {
     [GUILDS.WHID]: CHANNELS.LOW,
@@ -24,7 +18,7 @@ const lowlightChannelByGuild = {
 
 export const guilds = Object.keys(lowlightChannelByGuild);
 
-export const commandData = {
+export const commandData: CommandData = {
     defaultPermission: false,
     permissions: [
         // whid
@@ -94,7 +88,7 @@ async function pinMessage(
     lowlightsChannel: SendableChannels
 ) {
     await sendAuthorshipEmbed(lowlightsChannel, author);
-    message.forward(lowlightsChannel);
+    await message.forward(lowlightsChannel);
 }
 
 async function sendAuthorshipEmbed(

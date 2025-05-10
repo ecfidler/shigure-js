@@ -1,19 +1,21 @@
 import snoowrap from "snoowrap";
 import { GUILDS } from "../utilities/constants.js";
-import auth from "../auth.json";
 import { ApplicationCommandType } from "discord.js";
 import type { CommandArgs } from "../types/CommandArgs.js";
+import type { CommandData } from "../types/CommandData.js";
+import { auth } from "../auth.js";
 
 // Reddit Client
 let redditClient: snoowrap;
-let getRedditClientSingleton = () => {
+const getRedditClientSingleton = () => {
     if (redditClient == null) {
         redditClient = new snoowrap({
-            userAgent: auth.RuserAgent,
-            clientId: auth.RclientId,
-            clientSecret: auth.RclientSecret,
-            username: auth.Rusername,
-            password: auth.Rpassword,
+            // NOTE: We have already asserted that these vals exist
+            userAgent: auth.RuserAgent!,
+            clientId: auth.RclientId!,
+            clientSecret: auth.RclientSecret!,
+            username: auth.Rusername!,
+            password: auth.Rpassword!,
         });
     }
 
@@ -25,7 +27,7 @@ const errorMessage =
 
 export const guild = GUILDS.WHID;
 
-export const commandData = {
+export const commandData: CommandData = {
     description: "gets a random piece of artwork from r/copypasta.",
     type: ApplicationCommandType.ChatInput,
 };
@@ -79,7 +81,7 @@ export async function action({ interaction }: CommandArgs) {
         });
 }
 
-function checkAuthorizationHeadersForReddit(authObject: any) {
+function checkAuthorizationHeadersForReddit(authObject: typeof auth) {
     return (
         authObject.RuserAgent != null &&
         authObject.RclientId != null &&

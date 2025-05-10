@@ -9,7 +9,7 @@ import {
 
 export const guild = GUILDS.WHID;
 
-export const commandData = {
+export const commandData: CommandData = {
     description: "call and replay",
     options: [
         {

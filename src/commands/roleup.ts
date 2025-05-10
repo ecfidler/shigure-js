@@ -1,20 +1,19 @@
 import {
-    EmbedBuilder,
-    ApplicationCommandType,
     ApplicationCommandOptionType,
+    ApplicationCommandType,
     Colors,
+    EmbedBuilder,
     MessageFlags,
-    GuildMember,
-    type APIInteractionGuildMember,
 } from "discord.js";
-import { GUILDS } from "../utilities/constants";
-import { getButtonRows, getRoles } from "../utilities/roleup";
 import type { CommandArgs } from "../types/CommandArgs";
+import type { CommandData } from "../types/CommandData";
+import { GUILDS } from "../utilities/constants";
 import { isMemberCached } from "../utilities/isMemberCached";
+import { getButtonRows, getRoles } from "../utilities/roleup";
 
 export const guild = GUILDS.GLOBAL;
 
-export const commandData = {
+export const commandData: CommandData = {
     description:
         "Opens a menu to allow you to add or remove roles from yourself",
     options: [
@@ -61,7 +60,7 @@ export async function action({ client, interaction }: CommandArgs) {
     }
 
     if (interaction.guild.id !== GUILDS.WHID) {
-        interaction.reply({
+        await interaction.reply({
             content: "'roleup' is not availible in this server, sorry.",
             flags: MessageFlags.Ephemeral,
         });
@@ -70,7 +69,7 @@ export async function action({ client, interaction }: CommandArgs) {
 
     const category = interaction.options.get("category")?.value;
     if (category == null) {
-        interaction.reply({
+        await interaction.reply({
             content: "Please choose a category",
             flags: MessageFlags.Ephemeral,
         });
@@ -89,7 +88,7 @@ export async function action({ client, interaction }: CommandArgs) {
         0
     );
 
-    interaction.reply({
+    await interaction.reply({
         embeds: [roleMenuHeader],
         components: rows,
         flags: MessageFlags.Ephemeral,

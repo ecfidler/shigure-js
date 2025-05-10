@@ -1,13 +1,10 @@
-// Package imports
-const { Client, GatewayIntentBits, ActivityType } = require("discord.js");
-
-// Custom imports
-const auth = require("./auth.json");
-const commandManager = require("./utilities/command-manager");
-const { GUILDS } = require("./utilities/constants");
-const { joinSauceEmporiumEvent } = require("./events/joinSauceEmporium");
-const { toggleRoleButtonEvent } = require("./events/toggleRoleButton");
-const { changeRolesPageEvent } = require("./events/changeRolesPage");
+import { auth } from "./auth"
+import { Client, GatewayIntentBits, ActivityType } from "discord.js";
+import commandManager from "./utilities/command-manager";
+import { GUILDS } from "./utilities/constants";
+import { joinSauceEmporiumEvent } from "./events/joinSauceEmporium";
+import { toggleRoleButtonEvent } from "./events/toggleRoleButton";
+import { changeRolesPageEvent } from "./events/changeRolesPage";
 
 // Client Instance
 const client = new Client({
@@ -60,4 +57,4 @@ client.on("guildMemberAdd", member => {
 });
 
 // Login
-client.login(auth.token);
+client.login(auth.DISCORD_TOKEN);
