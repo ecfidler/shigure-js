@@ -1,6 +1,7 @@
 import type { CommandArgs } from "../types/CommandArgs";
 import { isMemberCached } from "../utilities/isMemberCached";
-import { getButtonRows, getRoles } from "../utilities/roleup";
+import { getPaginatedRoleSelectionMessage } from "../utilities/roles/getPaginatedRoleSelectionMessage";
+import { getRoles } from "../utilities/roleup";
 
 export async function changeRolesPageEvent({
     client,
@@ -20,7 +21,7 @@ export async function changeRolesPageEvent({
         return;
     }
 
-    const components = getButtonRows(
+    const components = getPaginatedRoleSelectionMessage(
         await getRoles(client, category, interaction.guild),
         interaction.member,
         category,

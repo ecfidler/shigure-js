@@ -16,7 +16,7 @@ import type { CommandData } from "../types/CommandData";
 
 // Setup Sauce finder
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
-const sauceFinder = new SauceNAO(auth.SauceNAOkey);
+const sauceFinder = new SauceNAO(auth.SauceNAOkey ?? "no-key");
 
 const SAUCE_NAO_AUTHOR = {
     name: "SauceNAO",

@@ -32,7 +32,6 @@ export const ROLES = {
 
 export const EMOJIS = {
     PIN: "📌",
-    SPEAK: "🕵",
 };
 
 export const OWNER = "173839815400357888";

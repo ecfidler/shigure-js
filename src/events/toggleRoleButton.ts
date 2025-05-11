@@ -8,7 +8,7 @@ import {
 import { roleMenuHeader } from "../commands/roleup";
 import type { CommandArgs } from "../types/CommandArgs";
 import { isMemberCached } from "../utilities/isMemberCached";
-import { hasRole } from "../utilities/roleup";
+import { hasRole } from "../utilities/roles/hasRole";
 
 export async function toggleRoleButtonEvent({ interaction }: CommandArgs) {
     if (!interaction.isButton() || !isMemberCached(interaction.member)) {

@@ -9,7 +9,8 @@ import type { CommandArgs } from "../types/CommandArgs";
 import type { CommandData } from "../types/CommandData";
 import { GUILDS } from "../utilities/constants";
 import { isMemberCached } from "../utilities/isMemberCached";
-import { getButtonRows, getRoles } from "../utilities/roleup";
+import { getRoles } from "../utilities/roleup";
+import { getPaginatedRoleSelectionMessage } from "../utilities/roles/getPaginatedRoleSelectionMessage";
 
 export const guild = GUILDS.GLOBAL;
 
@@ -81,7 +82,7 @@ export async function action({ client, interaction }: CommandArgs) {
         category.toString(),
         interaction.guild
     );
-    const rows = getButtonRows(
+    const rows = getPaginatedRoleSelectionMessage(
         roleData,
         interaction.member,
         category.toString(),

@@ -15,7 +15,7 @@ export const commandModuleByName = new Map<string, CommandModule>();
 
 export async function loadCommands(client: Client<true>) {
     console.info("Loading commands...");
-    const commandFilenames = fs.readdirSync("./commands");
+    const commandFilenames = fs.readdirSync("./src/commands");
 
     const globalCommands = [];
     const guildCommandDatasByGuildId = new Map<
@@ -62,7 +62,11 @@ export async function loadCommands(client: Client<true>) {
         if (guild != null) {
             holUp.push(guild.commands.set(guildCommandDatas));
         } else {
-            console.log("command is not in guild");
+            console.log(
+                `could not find guild with ID ${guildId} when processing ${guildCommandDatas
+                    .map(({ name }) => name)
+                    .join(", ")}`
+            );
         }
     }
 
