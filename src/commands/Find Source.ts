@@ -1,16 +1,16 @@
 import {
-    EmbedBuilder,
-    AttachmentBuilder,
     ApplicationCommandType,
+    AttachmentBuilder,
     Colors,
+    EmbedBuilder,
     MessageFlags,
 } from "discord.js";
 import { CHANNELS, GUILDS } from "../utilities/constants";
 // TODO: Replace SauceNAO with sagiri for type safety
 import SauceNAO from "saucenao";
+import { auth } from "../auth";
 import type { CommandArgs } from "../types/CommandArgs";
 import type { CommandData } from "../types/CommandData";
-import { auth } from "../auth";
 
 //const fs = require(`fs`); // TESTING ONLY
 
@@ -109,10 +109,10 @@ function formatSauce(payload: any, thumbnail: string) {
         if (parseInt(result.header.similarity) > 55) {
             // Only want results with similarity > 55
 
-            let idx = result.header.index_id;
-            if (idx == 5) {
+            const idx = result.header.index_id;
+            if (idx === 5) {
                 // Pixiv
-                let title = "Pixiv";
+                const title = "Pixiv";
                 let content = `Poster: ${result.data.member_name}`;
 
                 if (result.data?.ext_urls[0]) {
@@ -125,9 +125,9 @@ function formatSauce(payload: any, thumbnail: string) {
                 ]);
             }
 
-            if (idx == 41) {
+            if (idx === 41) {
                 // Twitter
-                let title = "Twitter";
+                const title = "Twitter";
                 let content = "";
 
                 if (result.data?.twitter_user_handle) {
@@ -144,9 +144,9 @@ function formatSauce(payload: any, thumbnail: string) {
                 ]);
             }
 
-            if (idx == 9) {
+            if (idx === 9) {
                 // Danbooru
-                let title = "Boorus";
+                const title = "Boorus";
                 let content = "";
 
                 if (result.data?.creator) {
@@ -173,7 +173,7 @@ function formatSauce(payload: any, thumbnail: string) {
         }
     });
 
-    if (sauce.data.fields?.length == 0) {
+    if (sauce.data.fields?.length === 0) {
         sauce.addFields([
             { name: "error", value: "No accurate sources found..." },
             {

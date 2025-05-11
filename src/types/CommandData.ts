@@ -1,19 +1,28 @@
 import type {
-    ApplicationCommandOption,
-    ApplicationCommandOptionType,
-    ApplicationCommandType,
+    ChatInputApplicationCommandData,
+    MessageApplicationCommandData,
+    UserApplicationCommandData,
 } from "discord.js";
 
-export interface CommandData {
-    readonly type: ApplicationCommandType;
-    readonly description?: string;
-    readonly permissions?: Permission[];
-    readonly defaultPermission?: false;
-    readonly options?: ApplicationCommandOption[];
-}
+export type CommandData =
+    | ChatInputCommandData
+    | MessageCommandData
+    | UserCommandData;
 
-export interface Permission {
-    id: string;
-    type: ApplicationCommandOptionType;
-    permission: true;
-}
+export type ChatInputCommandData = WithoutName<
+    RequireType<ChatInputApplicationCommandData>
+>;
+
+export type MessageCommandData = WithoutName<
+    RequireType<MessageApplicationCommandData>
+>;
+
+export type UserCommandData = WithoutName<
+    RequireType<UserApplicationCommandData>
+>;
+
+type WithoutName<T> = Omit<T, "name">;
+
+type RequireType<T> = "type" extends keyof T ? Require<T, "type"> : never;
+
+type Require<T, K extends keyof T> = Required<Pick<T, K>> & Omit<T, K>;

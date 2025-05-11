@@ -2,10 +2,15 @@ import type { CommandArgs } from "../types/CommandArgs";
 import { isMemberCached } from "../utilities/isMemberCached";
 import { getButtonRows, getRoles } from "../utilities/roleup";
 
-const { MessageFlags } = require("discord.js");
-
-async function changeRolesPageEvent({ client, interaction }: CommandArgs) {
-    if (!interaction.isButton() || !isMemberCached(interaction.member)) {
+export async function changeRolesPageEvent({
+    client,
+    interaction,
+}: CommandArgs) {
+    if (
+        !interaction.isButton() ||
+        !isMemberCached(interaction.member) ||
+        interaction.guild == null
+    ) {
         return;
     }
 
@@ -23,10 +28,6 @@ async function changeRolesPageEvent({ client, interaction }: CommandArgs) {
     );
 
     await interaction.update({
-        embeds: interaction.embeds,
         components: components,
-        flags: MessageFlags.Ephemeral,
     });
 }
-
-module.exports = { changeRolesPageEvent };

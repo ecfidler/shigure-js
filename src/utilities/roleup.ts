@@ -9,13 +9,12 @@ import {
     GuildMember,
     Role,
     type APIMessageComponentEmoji,
-    type ComponentEmojiResolvable,
 } from "discord.js";
 import {
-    MAX_BUTTONS_IN_ROW,
+    DISALLOWED_EMOJI_CHARACTERS_REGEX,
     GUILDS,
     MAX_BUTTON_ROWS,
-    DISALLOWED_EMOJI_CHARACTERS_REGEX,
+    MAX_BUTTONS_IN_ROW,
 } from "./constants";
 
 const MAX_ROLE_ROWS = MAX_BUTTON_ROWS - 1;
@@ -197,20 +196,14 @@ async function resolveRoleEmoji(
         return undefined;
     }
 
-    const customRoleEmoji = await getCustomRoleEmoji(
-        roleEmojiServerManager,
-        role
-    );
+    const customRoleEmoji = getCustomRoleEmoji(roleEmojiServerManager, role);
 
     if (customRoleEmoji != null) {
         return customRoleEmoji;
     }
 
     await makeCustomRoleEmoji(roleEmojiServerManager, role);
-    const newCustomRoleEmoji = await getCustomRoleEmoji(
-        roleEmojiServerManager,
-        role
-    );
+    const newCustomRoleEmoji = getCustomRoleEmoji(roleEmojiServerManager, role);
 
     if (newCustomRoleEmoji != null) {
         return newCustomRoleEmoji;
@@ -219,7 +212,7 @@ async function resolveRoleEmoji(
     throw new Error(`Could not create emoji for role ${role.name}`);
 }
 
-async function getCustomRoleEmoji(
+function getCustomRoleEmoji(
     roleEmojiServerManager: GuildEmojiManager,
     role: Role
 ) {

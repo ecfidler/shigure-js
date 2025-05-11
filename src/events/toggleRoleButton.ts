@@ -1,11 +1,7 @@
 import {
-    ActionRow,
-    ButtonBuilder,
     ButtonComponent,
     ButtonStyle,
     ComponentType,
-    MessageFlags,
-    type APIButtonComponent,
     type MessageActionRowComponent,
     type TopLevelComponent,
 } from "discord.js";
@@ -14,7 +10,7 @@ import type { CommandArgs } from "../types/CommandArgs";
 import { isMemberCached } from "../utilities/isMemberCached";
 import { hasRole } from "../utilities/roleup";
 
-async function toggleRoleButtonEvent({ interaction }: CommandArgs) {
+export async function toggleRoleButtonEvent({ interaction }: CommandArgs) {
     if (!interaction.isButton() || !isMemberCached(interaction.member)) {
         return;
     }
@@ -63,5 +59,3 @@ async function toggleRoleButtonEvent({ interaction }: CommandArgs) {
         components: newComponents,
     });
 }
-
-module.exports = { toggleRoleButtonEvent };

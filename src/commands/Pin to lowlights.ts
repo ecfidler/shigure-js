@@ -1,15 +1,15 @@
 import {
-    ApplicationCommandOptionType,
     ApplicationCommandType,
     EmbedBuilder,
     GuildMember,
     Message,
     MessageFlags,
+    PermissionFlagsBits,
     type SendableChannels,
 } from "discord.js";
 import type { CommandArgs } from "../types/CommandArgs";
 import type { CommandData } from "../types/CommandData";
-import { CHANNELS, EMOJIS, GUILDS, ROLES } from "../utilities/constants";
+import { CHANNELS, EMOJIS, GUILDS } from "../utilities/constants";
 
 const lowlightChannelByGuild = {
     [GUILDS.WHID]: CHANNELS.LOW,
@@ -19,22 +19,26 @@ const lowlightChannelByGuild = {
 export const guilds = Object.keys(lowlightChannelByGuild);
 
 export const commandData: CommandData = {
-    defaultPermission: false,
-    permissions: [
-        // whid
-        {
-            id: ROLES.MAJOR,
-            type: ApplicationCommandOptionType.Role,
-            permission: true,
-        },
-        // Ben testing server
-        {
-            id: "1335083523249406012",
-            type: ApplicationCommandOptionType.Role,
-            permission: true,
-        },
-    ],
     type: ApplicationCommandType.Message,
+    defaultMemberPermissions: PermissionFlagsBits.Administrator,
+    // TODO: I'm not exactly sure how this was working before because I can't find any docs
+    // for "permissions" field. For now, I've set "defaultMemberPermissoins" to administrator
+    // as a safe alternative.
+
+    // permissions: [
+    //     // whid
+    //     {
+    //         id: ROLES.MAJOR,
+    //         type: ApplicationCommandOptionType.Role,
+    //         permission: true,
+    //     },
+    //     // Ben testing server
+    //     {
+    //         id: "1335083523249406012",
+    //         type: ApplicationCommandOptionType.Role,
+    //         permission: true,
+    //     },
+    // ],
 };
 
 export async function action({ client, interaction }: CommandArgs) {

@@ -1,9 +1,9 @@
-import snoowrap from "snoowrap";
-import { GUILDS } from "../utilities/constants.js";
 import { ApplicationCommandType } from "discord.js";
+import snoowrap from "snoowrap";
+import { auth } from "../auth.js";
 import type { CommandArgs } from "../types/CommandArgs.js";
 import type { CommandData } from "../types/CommandData.js";
-import { auth } from "../auth.js";
+import { GUILDS } from "../utilities/constants.js";
 
 // Reddit Client
 let redditClient: snoowrap;

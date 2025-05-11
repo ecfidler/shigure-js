@@ -1,51 +1,51 @@
-import type { Client, CommandInteractionResolvedData, Permissions } from "discord.js";
+import type { ChatInputApplicationCommandData, Client } from "discord.js";
 import fs from "fs";
 import path from "path";
 import type { CommandArgs } from "../types/CommandArgs";
-import type { CommandData } from "../types/CommandData";
 
 interface CommandModule {
-  readonly guild?: string;
-  readonly guilds?: string;
-  readonly action: (args: CommandArgs) => void;
-  readonly name: string;
-  readonly commandData: CommandData;
+    readonly guild?: string;
+    readonly guilds?: string;
+    readonly action: (args: CommandArgs) => void;
+    readonly name: string;
+    readonly commandData: ChatInputApplicationCommandData;
 }
 
-export const commandByCommandName = new Map<string, CommandModule>();
+export const commandModuleByName = new Map<string, CommandModule>();
 
-export async function loadCommands(client: Client) {
+export async function loadCommands(client: Client<true>) {
     console.info("Loading commands...");
     const commandFilenames = fs.readdirSync("./commands");
 
     const globalCommands = [];
-    const specializedCommandsByGuildId = new Map();
+    const guildCommandDatasByGuildId = new Map<
+        string,
+        ChatInputApplicationCommandData[]
+    >();
     for (const commandFilename of commandFilenames) {
         const commandName = path.basename(commandFilename, ".ts");
-        commandByCommandName.set(
-            commandName,
-            await import ("../commands/" + commandFilename)
-        );
-        
-        const command = commandByCommandName.get(commandName);
-        if (!command.commandData.name) {
-            command.commandData.name = commandName;
+        const commandModule = await loadMutableCommandModule(commandFilename);
+
+        commandModuleByName.set(commandName, commandModule);
+
+        if (commandModule.commandData.name == null) {
+            commandModule.commandData.name = commandName;
         }
 
-        if (command.guild === "global") {
-            globalCommands.push(command.commandData);
-        } else if (command.guild != null) {
+        if (commandModule.guild === "global") {
+            globalCommands.push(commandModule.commandData);
+        } else if (commandModule.guild != null) {
             pushOrCreate(
-                specializedCommandsByGuildId,
-                command.guild,
-                command.commandData
+                guildCommandDatasByGuildId,
+                commandModule.guild,
+                commandModule.commandData
             );
-        } else if (command.guilds != null) {
-            for (const guild of command.guilds) {
+        } else if (commandModule.guilds != null) {
+            for (const guild of commandModule.guilds) {
                 pushOrCreate(
-                    specializedCommandsByGuildId,
+                    guildCommandDatasByGuildId,
                     guild,
-                    command.commandData
+                    commandModule.commandData
                 );
             }
         }
@@ -57,14 +57,14 @@ export async function loadCommands(client: Client) {
 
     const holUp = [];
 
-    specializedCommandsByGuildId.forEach((specialCommands, guildID) => {
-        const guild = client.guilds.cache.get(guildID);
+    for (const [guildId, guildCommandDatas] of guildCommandDatasByGuildId) {
+        const guild = client.guilds.cache.get(guildId);
         if (guild != null) {
-            holUp.push(guild.commands.set(specialCommands));
+            holUp.push(guild.commands.set(guildCommandDatas));
         } else {
             console.log("command is not in guild");
         }
-    });
+    }
 
     // Testing only
     // const guild = client.guilds.cache.get("173840048343482368");
@@ -76,59 +76,38 @@ export async function loadCommands(client: Client) {
     await Promise.all(holUp);
 
     console.info("Registered commands!");
-
-    /*
-  console.info("Setting permissions...");
-
-  const holUp2 = [];
-
-  client.guilds.cache.forEach((guild) => {
-    guild.commands.cache.forEach((command) => {
-      const commandImport = commandByCommandName.get(command.name);
-      if (commandImport.commandData.permissions) {
-        holUp2.push(command.permissions.set({permissions: commandImport.commandData.permissions}));
-      }
-    });
-  });
-
-  client.application.commands.cache.forEach((command) => {
-    const commandImport = commandByCommandName.get(command.name);
-    if (commandImport.commandData.permissions) {
-      holUp2.push(command.permissions.set({permissions: commandImport.commandData.permissions}));
-    }
-  });
-
-  await Promise.all(holUp2);
-
-  console.info("Set permissions!");
-  
-  // Code to remove all commands from servers
-  console.log("deleting all commands");
-  await client.application.commands.fetch();
-  client.application.commands.cache.forEach(async (command) => {
-    console.log(`deleting ${command.name}`);
-    await command.delete();
-    console.log(`deleted ${command.name}`);
-  });
-
-  client.guilds.cache.forEach(async (guild) => {
-    await guild.commands.fetch();
-    guild.commands.cache.forEach(async (command) => {
-      console.log(`deleting ${command.name}`);
-      await command.delete();
-      console.log(`deleted ${command.name}`);
-    });
-  });
-  */
 }
 
-function pushOrCreate(map, key, value) {
+async function loadMutableCommandModule(commandFilename: string) {
+    return (await loadCommandModule(
+        commandFilename
+    )) as DeepMutable<CommandModule>;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
+type DeepMutable<T> = T extends number | string | Function
+    ? T
+    : T extends ReadonlyArray<unknown>
+    ? Mutable<T>
+    : {
+          -readonly [P in keyof T]: DeepMutable<T[P]>;
+      };
+
+type Mutable<T> = {
+    -readonly [P in keyof T]: T[P];
+};
+
+async function loadCommandModule(
+    commandFilename: string
+): Promise<CommandModule> {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    return import("../commands/" + commandFilename);
+}
+
+function pushOrCreate<K, V>(map: Map<K, V[]>, key: K, value: V) {
     if (map.has(key)) {
-        map.get(key).push(value);
+        map.get(key)!.push(value);
     } else {
         map.set(key, [value]);
     }
 }
-// function reloadCommands(client) {}
-
-// function reloadCommand(client) {}

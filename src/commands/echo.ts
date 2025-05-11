@@ -1,15 +1,17 @@
-import type { CommandArgs } from "../types/CommandArgs";
-import { GUILDS } from "../utilities/constants";
 import {
-    ApplicationCommandType,
     ApplicationCommandOptionType,
-    MessageFlags,
+    ApplicationCommandType,
     ChannelType,
+    MessageFlags,
 } from "discord.js";
+import type { CommandArgs } from "../types/CommandArgs";
+import type { CommandData } from "../types/CommandData";
+import { GUILDS } from "../utilities/constants";
 
 export const guild = GUILDS.WHID;
 
 export const commandData: CommandData = {
+    type: ApplicationCommandType.ChatInput,
     description: "call and replay",
     options: [
         {
@@ -19,7 +21,6 @@ export const commandData: CommandData = {
             required: true,
         },
     ],
-    type: ApplicationCommandType.ChatInput,
 };
 
 export async function action({ interaction }: CommandArgs) {

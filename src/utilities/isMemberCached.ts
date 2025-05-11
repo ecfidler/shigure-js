@@ -7,5 +7,5 @@ export function isMemberCached(
         return false;
     }
 
-    return member.hasOwnProperty("client");
+    return Object.prototype.hasOwnProperty.call(member, "client");
 }
