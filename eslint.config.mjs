@@ -12,7 +12,7 @@ export default tseslint.config(
             "@typescript-eslint/restrict-template-expressions": "off",
             "@typescript-eslint/no-base-to-string": "off",
             "@typescript-eslint/no-floating-promises": "off",
-            "@typescript-eslint/no-explicit-any": "warn", // TODO: Remove these
+            "@typescript-eslint/no-explicit-any": "warn",
             "@typescript-eslint/no-unsafe-call": "warn",
             "@typescript-eslint/no-unsafe-argument": "warn",
             "@typescript-eslint/no-unsafe-assignment": "warn",
