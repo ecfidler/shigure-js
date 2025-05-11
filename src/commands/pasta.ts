@@ -1,18 +1,21 @@
-const snoowrap = require("snoowrap");
-const { GUILDS } = require("../utilities/constants.js");
-const auth = require("../auth.json");
-const { ApplicationCommandType } = require("discord.js");
+import { ApplicationCommandType } from "discord.js";
+import snoowrap from "snoowrap";
+import { auth } from "../auth.js";
+import type { CommandArgs } from "../types/CommandArgs.js";
+import type { CommandData } from "../types/CommandData.js";
+import { GUILDS } from "../utilities/constants.js";
 
 // Reddit Client
-let redditClient;
-let getRedditClientSingleton = () => {
+let redditClient: snoowrap;
+const getRedditClientSingleton = () => {
     if (redditClient == null) {
         redditClient = new snoowrap({
-            userAgent: auth.RuserAgent,
-            clientId: auth.RclientId,
-            clientSecret: auth.RclientSecret,
-            username: auth.Rusername,
-            password: auth.Rpassword,
+            // NOTE: We have already asserted that these vals exist
+            userAgent: auth.RuserAgent!,
+            clientId: auth.RclientId!,
+            clientSecret: auth.RclientSecret!,
+            username: auth.Rusername!,
+            password: auth.Rpassword!,
         });
     }
 
@@ -22,17 +25,25 @@ let getRedditClientSingleton = () => {
 const errorMessage =
     "OOPSIE WOOPSIE!! Uwu We made a fucky wucky!! A wittle fucko boingo! The code monkeys at our headquarters are working VEWY HAWD to fix this!\n_~error message_";
 
-const guild = GUILDS.WHID;
+export const guild = GUILDS.WHID;
 
-const commandData = {
+export const commandData: CommandData = {
     description: "gets a random piece of artwork from r/copypasta.",
     type: ApplicationCommandType.ChatInput,
 };
 
-async function action(client, interaction) {
+export async function action({ interaction }: CommandArgs) {
+    if (
+        !interaction.isChatInputCommand() ||
+        interaction.guildId == null ||
+        interaction.guild == null
+    ) {
+        return;
+    }
+
     const enablePastaCommand = checkAuthorizationHeadersForReddit(auth);
     if (!enablePastaCommand) {
-        console.warning(
+        console.warn(
             "No reddit API credentials provided. Reddit features will not work"
         );
         return;
@@ -70,7 +81,7 @@ async function action(client, interaction) {
         });
 }
 
-function checkAuthorizationHeadersForReddit(authObject) {
+function checkAuthorizationHeadersForReddit(authObject: typeof auth) {
     return (
         authObject.RuserAgent != null &&
         authObject.RclientId != null &&
@@ -79,5 +90,3 @@ function checkAuthorizationHeadersForReddit(authObject) {
         authObject.Rpassword != null
     );
 }
-
-module.exports = { commandData, action, guild };
