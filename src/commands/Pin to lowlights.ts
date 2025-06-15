@@ -1,15 +1,14 @@
 import {
     ApplicationCommandType,
-    EmbedBuilder,
-    GuildMember,
-    Message,
+    ChannelType,
     MessageFlags,
     PermissionFlagsBits,
-    type SendableChannels,
+    type TextBasedChannel,
 } from "discord.js";
 import type { CommandArgs } from "../types/CommandArgs";
 import type { CommandData } from "../types/CommandData";
 import { CHANNELS, EMOJIS, GUILDS } from "../utilities/constants";
+import { pinMessageViaForward } from "../utilities/lowlights/pinMessageViaForward";
 
 const lowlightChannelByGuild = {
     [GUILDS.WHID]: CHANNELS.LOW,
@@ -22,7 +21,7 @@ export const commandData: CommandData = {
     type: ApplicationCommandType.Message,
     defaultMemberPermissions: PermissionFlagsBits.Administrator,
     // TODO: I'm not exactly sure how this was working before because I can't find any docs
-    // for "permissions" field. For now, I've set "defaultMemberPermissoins" to administrator
+    // for "permissions" field. For now, I've set "defaultMemberPermissions" to administrator
     // as a safe alternative.
 
     // permissions: [
@@ -74,8 +73,18 @@ export async function action({ client, interaction }: CommandArgs) {
     const message = interaction.targetMessage;
     const author = await interaction.guild.members.fetch(message.author.id);
 
-    // TODO: Use message components
-    await pinMessage(author, message, lowlightsChannel);
+    if (isTextChannelAgeRestricted(message.channel)) {
+        // TODO: Support age-restricted channels
+        await interaction.reply({
+            content:
+                "Erm...  I haven't added support for age-restricted channels yet.",
+            flags: MessageFlags.Ephemeral,
+        });
+        return;
+    } else {
+        // TODO: Use message components maybe?
+        await pinMessageViaForward(author, message, lowlightsChannel);
+    }
 
     await message.react(EMOJIS.PIN);
     await message.reply(`${EMOJIS.PIN} Pinned!`);
@@ -86,25 +95,15 @@ export async function action({ client, interaction }: CommandArgs) {
     });
 }
 
-async function pinMessage(
-    author: GuildMember,
-    message: Message,
-    lowlightsChannel: SendableChannels
-) {
-    await sendAuthorshipEmbed(lowlightsChannel, author);
-    await message.forward(lowlightsChannel);
-}
-
-async function sendAuthorshipEmbed(
-    lowlightsChannel: SendableChannels,
-    member: GuildMember
-) {
-    await lowlightsChannel.send({
-        embeds: [
-            new EmbedBuilder().setColor(member.displayHexColor).setFooter({
-                text: `${member.displayName}`,
-                iconURL: member.user.displayAvatarURL(),
-            }),
-        ],
-    });
+function isTextChannelAgeRestricted(channel: TextBasedChannel): boolean {
+    switch (channel.type) {
+        case ChannelType.DM:
+        case ChannelType.GroupDM:
+        case ChannelType.PublicThread:
+        case ChannelType.AnnouncementThread:
+        case ChannelType.PrivateThread:
+            return false;
+        default:
+            return channel.nsfw;
+    }
 }
