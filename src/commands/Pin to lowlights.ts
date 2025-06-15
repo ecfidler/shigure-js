@@ -9,6 +9,7 @@ import type { CommandArgs } from "../types/CommandArgs";
 import type { CommandData } from "../types/CommandData";
 import { CHANNELS, EMOJIS, GUILDS } from "../utilities/constants";
 import { pinMessageViaForward } from "../utilities/lowlights/pinMessageViaForward";
+import { pinMessageViaEmbed } from "../utilities/lowlights/pinMessageViaEmbed";
 
 const lowlightChannelByGuild = {
     [GUILDS.WHID]: CHANNELS.LOW,
@@ -73,16 +74,15 @@ export async function action({ client, interaction }: CommandArgs) {
     const message = interaction.targetMessage;
     const author = await interaction.guild.members.fetch(message.author.id);
 
+    // TODO: Use message components maybe?
     if (isTextChannelAgeRestricted(message.channel)) {
-        // TODO: Support age-restricted channels
-        await interaction.reply({
-            content:
-                "Erm...  I haven't added support for age-restricted channels yet.",
-            flags: MessageFlags.Ephemeral,
-        });
-        return;
+        await pinMessageViaEmbed(
+            author,
+            message,
+            interaction.user,
+            lowlightsChannel
+        );
     } else {
-        // TODO: Use message components maybe?
         await pinMessageViaForward(author, message, lowlightsChannel);
     }
 
