@@ -1,8 +1,8 @@
 import {
-    ButtonComponent,
+    ActionRowBuilder,
+    ButtonBuilder,
     ButtonStyle,
     ComponentType,
-    type MessageActionRowComponent,
     type TopLevelComponent,
 } from "discord.js";
 import { roleMenuHeader } from "../commands/roleup";
@@ -27,34 +27,44 @@ export async function toggleRoleButtonEvent({ interaction }: CommandArgs) {
         await interaction.member.roles.add(roleId);
     }
 
-    const newComponents: TopLevelComponent[] = [];
-    for (const row of interaction.message.components) {
-        if (row.type !== ComponentType.ActionRow) {
-            newComponents.push(row);
+    const newComponents: (
+        | TopLevelComponent
+        | ActionRowBuilder<ButtonBuilder>
+    )[] = [];
+
+    for (const component of interaction.message.components) {
+        if (component.type !== ComponentType.ActionRow) {
+            newComponents.push(component);
             continue;
         }
 
-        const actions: MessageActionRowComponent[] = [];
-        for (const action of row.components) {
-            if (
-                action.type !== ComponentType.Button ||
-                action.customId !== interaction.customId
-            ) {
-                actions.push(action);
+        const actionRowBuilder = new ActionRowBuilder<ButtonBuilder>();
+        for (const action of component.components) {
+            if (action.type !== ComponentType.Button) {
+                // We drop non-buttons here. There isn't a reasonable way to do this otherwise.
                 continue;
             }
-
-            actions.push({
-                ...action,
-                style: memberHasRole
-                    ? ButtonStyle.Secondary
-                    : ButtonStyle.Success,
-            } as ButtonComponent);
+            const buttonBuilder = ButtonBuilder.from(action);
+            if (action.customId === interaction.customId) {
+                buttonBuilder.setStyle(toggleButtonStyle(action.style));
+            }
+            actionRowBuilder.addComponents(buttonBuilder);
         }
+        newComponents.push(actionRowBuilder);
     }
 
     await interaction.update({
         embeds: [roleMenuHeader],
         components: newComponents,
     });
+}
+
+function toggleButtonStyle(style: ButtonStyle | undefined) {
+    // Note: we only expect success or secondary.
+    // If we encounter an unexpected value, then set it to secondary.
+
+    if (style === ButtonStyle.Secondary) {
+        return ButtonStyle.Success;
+    }
+    return ButtonStyle.Secondary;
 }
