@@ -36,12 +36,7 @@ export const commandData: CommandData = {
 };
 
 export async function action({ interaction }: CommandArgs) {
-    if (
-        !interaction.isChatInputCommand() ||
-        interaction.guildId == null ||
-        interaction.guild == null ||
-        interaction.options == null
-    ) {
+    if (!interaction.isChatInputCommand()) {
         return;
     }
 

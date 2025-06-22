@@ -1,5 +1,4 @@
 import type { CommandArgs } from "../types/CommandArgs";
-import { isMemberCached } from "../utilities/isMemberCached";
 import { getPaginatedRoleSelectionMessage } from "../utilities/roles/getPaginatedRoleSelectionMessage";
 import { getRoles } from "../utilities/roleup";
 
@@ -7,11 +6,7 @@ export async function changeRolesPageEvent({
     client,
     interaction,
 }: CommandArgs) {
-    if (
-        !interaction.isButton() ||
-        !isMemberCached(interaction.member) ||
-        interaction.guild == null
-    ) {
+    if (!interaction.isButton()) {
         return;
     }
 

@@ -23,21 +23,33 @@ client.once("ready", readyClient => {
 });
 
 client.on("interactionCreate", interaction => {
-    if (interaction.isCommand()) {
-        commandModuleByName
-            .get(interaction.commandName)
-            ?.action({ client, interaction });
-        return;
-    }
+    (async () => {
+        try {
+            if (!interaction.inCachedGuild()) {
+                return;
+            }
 
-    if (interaction.isButton()) {
-        if (interaction.customId.startsWith("toggleRoleButton_")) {
-            toggleRoleButtonEvent({ client, interaction });
-        } else if (interaction.customId.startsWith("changeRolesPage_")) {
-            changeRolesPageEvent({ client, interaction });
+            if (interaction.isCommand()) {
+                await commandModuleByName
+                    .get(interaction.commandName)
+                    ?.action({ client, interaction });
+                return;
+            }
+
+            if (interaction.isButton()) {
+                if (interaction.customId.startsWith("toggleRoleButton_")) {
+                    toggleRoleButtonEvent({ client, interaction });
+                } else if (
+                    interaction.customId.startsWith("changeRolesPage_")
+                ) {
+                    changeRolesPageEvent({ client, interaction });
+                }
+                return;
+            }
+        } catch (error) {
+            console.error("Error handling interaction:", error);
         }
-        return;
-    }
+    })();
 });
 
 client.on("guildMemberAdd", member => {

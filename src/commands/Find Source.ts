@@ -39,11 +39,6 @@ export async function action({ interaction }: CommandArgs) {
         return;
     }
 
-    if (interaction.guild == null) {
-        console.error("Interaction called with no guild");
-        return;
-    }
-
     if (interaction.channel == null) {
         console.error("Interaction called with no channel");
         return;

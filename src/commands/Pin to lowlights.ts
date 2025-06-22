@@ -14,7 +14,7 @@ import { CHANNELS, EMOJIS, GUILDS } from "../utilities/constants";
 const lowlightChannelByGuild = {
     [GUILDS.WHID]: CHANNELS.LOW,
     [GUILDS.BEN_TESTING]: CHANNELS.LOW_TEST,
-};
+} as const;
 
 export const guilds = Object.keys(lowlightChannelByGuild);
 
@@ -42,11 +42,7 @@ export const commandData: CommandData = {
 };
 
 export async function action({ client, interaction }: CommandArgs) {
-    if (
-        !interaction.isMessageContextMenuCommand() ||
-        interaction.guildId == null ||
-        interaction.guild == null
-    ) {
+    if (!interaction.isMessageContextMenuCommand()) {
         return;
     }
 

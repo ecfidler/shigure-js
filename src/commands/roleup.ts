@@ -8,7 +8,6 @@ import {
 import type { CommandArgs } from "../types/CommandArgs";
 import type { CommandData } from "../types/CommandData";
 import { GUILDS } from "../utilities/constants";
-import { isMemberCached } from "../utilities/isMemberCached";
 import { getRoles } from "../utilities/roleup";
 import { getPaginatedRoleSelectionMessage } from "../utilities/roles/getPaginatedRoleSelectionMessage";
 
@@ -49,14 +48,7 @@ export const roleMenuHeader = new EmbedBuilder()
     }); // TODO: add author icon?
 
 export async function action({ client, interaction }: CommandArgs) {
-    if (
-        !interaction.isChatInputCommand() ||
-        interaction.guildId == null ||
-        interaction.guild == null ||
-        interaction.options == null ||
-        interaction.member == null ||
-        !isMemberCached(interaction.member)
-    ) {
+    if (!interaction.isChatInputCommand()) {
         return;
     }
 

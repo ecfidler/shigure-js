@@ -6,7 +6,7 @@ import type { CommandArgs } from "../types/CommandArgs";
 interface CommandModule {
     readonly guild?: string;
     readonly guilds?: string;
-    readonly action: (args: CommandArgs) => void;
+    readonly action: (args: CommandArgs) => Promise<void>;
     readonly name: string;
     readonly commandData: ChatInputApplicationCommandData;
 }
