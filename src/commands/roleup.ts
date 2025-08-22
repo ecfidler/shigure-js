@@ -4,6 +4,7 @@ import {
     Colors,
     EmbedBuilder,
     MessageFlags,
+    TextDisplayBuilder,
 } from "discord.js";
 import type { CommandArgs } from "../types/CommandArgs";
 import type { CommandData } from "../types/CommandData";
@@ -69,21 +70,24 @@ export async function action({ client, interaction }: CommandArgs) {
         return;
     }
 
-    const roleData = await getRoles(
+    const roles = await getRoles(
         client,
         category.toString(),
         interaction.guild
     );
     const rows = getPaginatedRoleSelectionMessage(
-        roleData,
+        roles,
         interaction.member,
         category.toString(),
         0
     );
 
+    const header = new TextDisplayBuilder().setContent(
+        "## Choose your roles!\nClick on a gray role to add it; click on a green role to remove it."
+    );
+
     await interaction.reply({
-        embeds: [roleMenuHeader],
-        components: rows,
-        flags: MessageFlags.Ephemeral,
+        components: [header, ...rows],
+        flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2,
     });
 }
