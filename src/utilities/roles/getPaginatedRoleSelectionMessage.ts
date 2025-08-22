@@ -6,11 +6,11 @@ import {
     GuildEmoji,
     type APIMessageComponentEmoji,
 } from "discord.js";
-import { MAX_BUTTON_ROWS, MAX_BUTTONS_IN_ROW } from "../constants";
+import { MAX_BUTTONS_IN_ROW } from "../constants";
 import { hasRole } from "./hasRole";
 import type { RoleAndEmoji } from "./RoleAndEmoji";
 
-export const MAX_ROLE_ROWS = MAX_BUTTON_ROWS - 1;
+export const MAX_ROLE_ROWS = 6;
 export const MAX_ROLES_PER_PAGE = MAX_BUTTONS_IN_ROW * MAX_ROLE_ROWS;
 
 export function getPaginatedRoleSelectionMessage(
@@ -23,7 +23,7 @@ export function getPaginatedRoleSelectionMessage(
         a.role.name.localeCompare(b.role.name)
     );
 
-    if (sortedRoles.length > MAX_BUTTON_ROWS * MAX_BUTTONS_IN_ROW) {
+    if (sortedRoles.length > MAX_ROLES_PER_PAGE) {
         return getButtonRowsWithPages(sortedRoles, member, category, page);
     }
 
@@ -35,7 +35,7 @@ function getButtonRowsWithoutPages(
     member: GuildMember
 ) {
     const rows = [];
-    rows.push(...makeRoleRows(MAX_BUTTON_ROWS, serverRoles, member));
+    rows.push(...makeRoleRows(MAX_ROLE_ROWS, serverRoles, member));
     return rows;
 }
 
@@ -80,15 +80,16 @@ function makeRoleRows(
     member: GuildMember
 ) {
     const rows = [];
-    let i = 0;
-    while (i < numRows && i * MAX_BUTTONS_IN_ROW < roles.length) {
-        const rolesInRow = roles.slice(
-            i * MAX_BUTTONS_IN_ROW,
-            (i + 1) * MAX_BUTTONS_IN_ROW
-        );
+    for (let i = 0; i < numRows; i++) {
+        const rowStartIndex = i * MAX_BUTTONS_IN_ROW;
+        const rowEndIndex = (i + 1) * MAX_BUTTONS_IN_ROW;
+        if (rowStartIndex >= roles.length) {
+            continue;
+        }
+
+        const rolesInRow = roles.slice(rowStartIndex, rowEndIndex);
         const row = makeRowOfRoles(rolesInRow, member);
         rows.push(row);
-        i++;
     }
     return rows;
 }
