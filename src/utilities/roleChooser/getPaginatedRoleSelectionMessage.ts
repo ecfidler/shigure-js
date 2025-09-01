@@ -13,12 +13,17 @@ import type { RoleAndEmoji } from "../roles/RoleAndEmoji";
 export const MAX_ROLE_ROWS = 6;
 export const MAX_ROLES_PER_PAGE = MAX_BUTTONS_IN_ROW * MAX_ROLE_ROWS;
 
+export interface Return {
+    readonly roleRows: ActionRowBuilder<ButtonBuilder>[];
+    readonly pageButtons?: ActionRowBuilder<ButtonBuilder>;
+}
+
 export function getPaginatedRoleSelectionMessage(
     serverRoles: readonly RoleAndEmoji[],
     member: GuildMember,
     category: string,
     page: number
-) {
+): Return {
     const sortedRoles = [...serverRoles].sort((a, b) =>
         a.role.name.localeCompare(b.role.name)
     );
@@ -26,7 +31,6 @@ export function getPaginatedRoleSelectionMessage(
     if (sortedRoles.length <= MAX_ROLES_PER_PAGE) {
         return {
             roleRows: getButtonRowsWithoutPages(sortedRoles, member),
-            pageButtons: undefined,
         };
     }
 
@@ -85,7 +89,7 @@ function makeRoleRows(
         const rowStartIndex = i * MAX_BUTTONS_IN_ROW;
         const rowEndIndex = (i + 1) * MAX_BUTTONS_IN_ROW;
         if (rowStartIndex >= roles.length) {
-            continue;
+            break;
         }
 
         const rolesInRow = roles.slice(rowStartIndex, rowEndIndex);

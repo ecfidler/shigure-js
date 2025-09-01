@@ -23,7 +23,7 @@ export async function renderRoleChooser(
         | StringSelectMenuInteraction<"cached">,
     category: string = "interests",
     pageNumber: number = 0
-) {
+): Promise<readonly ContainerBuilder[]> {
     const roles = await getRoles(client, category, interaction.guild);
 
     const { pageButtons, roleRows } = getPaginatedRoleSelectionMessage(

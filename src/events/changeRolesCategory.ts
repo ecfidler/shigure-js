@@ -19,7 +19,6 @@ export async function changeRolesCategoryEvent({
 
     const category = interaction.values[0];
     if (interaction.values.length !== 1 || category == null) {
-        // TODO: Error response
         console.error("Role category not found in category change event");
         return;
     }
