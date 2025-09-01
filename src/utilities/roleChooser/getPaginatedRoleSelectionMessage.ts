@@ -7,8 +7,8 @@ import {
     type APIMessageComponentEmoji,
 } from "discord.js";
 import { MAX_BUTTONS_IN_ROW } from "../constants";
-import { hasRole } from "./hasRole";
-import type { RoleAndEmoji } from "./RoleAndEmoji";
+import { hasRole } from "../roles/hasRole";
+import type { RoleAndEmoji } from "../roles/RoleAndEmoji";
 
 export const MAX_ROLE_ROWS = 6;
 export const MAX_ROLES_PER_PAGE = MAX_BUTTONS_IN_ROW * MAX_ROLE_ROWS;
@@ -23,55 +23,56 @@ export function getPaginatedRoleSelectionMessage(
         a.role.name.localeCompare(b.role.name)
     );
 
-    if (sortedRoles.length > MAX_ROLES_PER_PAGE) {
-        return getButtonRowsWithPages(sortedRoles, member, category, page);
+    if (sortedRoles.length <= MAX_ROLES_PER_PAGE) {
+        return {
+            roleRows: getButtonRowsWithoutPages(sortedRoles, member),
+            pageButtons: undefined,
+        };
     }
 
-    return getButtonRowsWithoutPages(sortedRoles, member);
+    return {
+        roleRows: getButtonRowsWithPages(sortedRoles, member, page),
+        pageButtons: getPageSwitchingRow(category, page, sortedRoles.length),
+    };
 }
 
 function getButtonRowsWithoutPages(
-    serverRoles: readonly RoleAndEmoji[],
+    roles: readonly RoleAndEmoji[],
     member: GuildMember
 ) {
-    const rows = [];
-    rows.push(...makeRoleRows(MAX_ROLE_ROWS, serverRoles, member));
-    return rows;
+    return makeRoleRows(MAX_ROLE_ROWS, roles, member);
 }
 
 function getButtonRowsWithPages(
     allRoles: readonly RoleAndEmoji[],
     member: GuildMember,
-    category: string,
     page: number
 ) {
-    const rows = [];
-
-    const numPages = Math.ceil(allRoles.length / MAX_ROLES_PER_PAGE);
-
     const rolesOnPage = allRoles.slice(
         page * MAX_ROLES_PER_PAGE,
         (page + 1) * MAX_ROLES_PER_PAGE
     );
 
-    rows.push(...makeRoleRows(MAX_ROLE_ROWS, rolesOnPage, member));
-    rows.push(
-        new ActionRowBuilder<ButtonBuilder>().addComponents(
-            new ButtonBuilder({
-                label: "<",
-                style: ButtonStyle.Primary,
-                custom_id: `changeRolesPage_${category}_${page - 1}`,
-                disabled: page === 0,
-            }),
-            new ButtonBuilder({
-                label: ">",
-                style: ButtonStyle.Primary,
-                custom_id: `changeRolesPage_${category}_${page + 1}`,
-                disabled: page + 1 === numPages,
-            })
-        )
+    return makeRoleRows(MAX_ROLE_ROWS, rolesOnPage, member);
+}
+
+function getPageSwitchingRow(category: string, page: number, numRoles: number) {
+    const numPages = Math.ceil(numRoles / MAX_ROLES_PER_PAGE);
+
+    return new ActionRowBuilder<ButtonBuilder>().addComponents(
+        new ButtonBuilder({
+            label: "<",
+            style: ButtonStyle.Primary,
+            custom_id: `changeRolesPage_${category}_${page - 1}`,
+            disabled: page === 0,
+        }),
+        new ButtonBuilder({
+            label: ">",
+            style: ButtonStyle.Primary,
+            custom_id: `changeRolesPage_${category}_${page + 1}`,
+            disabled: page + 1 === numPages,
+        })
     );
-    return rows;
 }
 
 function makeRoleRows(

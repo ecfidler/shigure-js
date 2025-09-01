@@ -1,6 +1,5 @@
 import type { CommandArgs } from "../types/CommandArgs";
-import { getPaginatedRoleSelectionMessage } from "../utilities/roles/getPaginatedRoleSelectionMessage";
-import { getRoles } from "../utilities/roleup";
+import { renderRoleChooser } from "../utilities/roleChooser/renderRoleChooser";
 
 export async function changeRolesPageEvent({
     client,
@@ -10,17 +9,24 @@ export async function changeRolesPageEvent({
         return;
     }
 
-    const [category, pageNumber] = interaction.customId.split("_").slice(1);
-    if (category == null || pageNumber == null) {
-        console.error("Invalid role change event");
+    if (!client.isReady()) {
         return;
     }
 
-    const components = getPaginatedRoleSelectionMessage(
-        await getRoles(client, category, interaction.guild),
-        interaction.member,
+    const [category, pageNumberString] = interaction.customId
+        .split("_")
+        .slice(1);
+    const pageNumber = Number.parseInt(pageNumberString ?? "");
+    if (category == null || Number.isNaN(pageNumber)) {
+        console.error("Invalid role page change event");
+        return;
+    }
+
+    const components = await renderRoleChooser(
+        client,
+        interaction,
         category,
-        parseInt(pageNumber)
+        pageNumber
     );
 
     await interaction.update({

@@ -1,6 +1,6 @@
 import { Client, Guild, GuildEmojiManager, Role } from "discord.js";
-import { DISALLOWED_EMOJI_CHARACTERS_REGEX, GUILDS } from "./constants";
-import type { RoleAndEmoji } from "./roles/RoleAndEmoji";
+import { DISALLOWED_EMOJI_CHARACTERS_REGEX, GUILDS } from "../constants";
+import type { RoleAndEmoji } from "./RoleAndEmoji";
 
 export async function getRoles(client: Client, category: string, guild: Guild) {
     const guildRoles = guild.roles.cache;
