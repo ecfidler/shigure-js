@@ -6,12 +6,16 @@ import {
     GuildEmoji,
     type APIMessageComponentEmoji,
 } from "discord.js";
-import { MAX_BUTTONS_IN_ROW } from "../constants";
 import { hasRole } from "../roles/hasRole";
 import type { RoleAndEmoji } from "../roles/RoleAndEmoji";
 
-export const MAX_ROLE_ROWS = 6;
-export const MAX_ROLES_PER_PAGE = MAX_BUTTONS_IN_ROW * MAX_ROLE_ROWS;
+/**
+ * Note: this value must be <= 5 per API limits
+ */
+const MAX_BUTTONS_IN_ROW = 4;
+
+const MAX_ROLE_ROWS = 6;
+const MAX_ROLES_PER_PAGE = MAX_BUTTONS_IN_ROW * MAX_ROLE_ROWS;
 
 export interface Return {
     readonly roleRows: ActionRowBuilder<ButtonBuilder>[];

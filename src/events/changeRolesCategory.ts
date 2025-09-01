@@ -23,11 +23,6 @@ export async function changeRolesCategoryEvent({
         return;
     }
 
-    if (category == null) {
-        console.error("Invalid role category change event");
-        return;
-    }
-
     const components = await renderRoleChooser(client, interaction, category);
 
     await interaction.update({

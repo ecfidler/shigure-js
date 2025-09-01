@@ -41,11 +41,6 @@ export const EMOJIS = {
 export const OWNER = "173839815400357888";
 
 /**
- * API limit is 5
- */
-export const MAX_BUTTONS_IN_ROW = 4;
-
-/**
  * Regex of characters not allowed in emoji names, such as spaces or periods.
  */
 export const DISALLOWED_EMOJI_CHARACTERS_REGEX = /[ .]/g;
