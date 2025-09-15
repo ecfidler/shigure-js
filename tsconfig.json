@@ -20,6 +20,6 @@
 
         "forceConsistentCasingInFileNames": true,
         "strictNullChecks": true,
-        "noImplicitAny": true // TODO: Change to true during migration
+        "noImplicitAny": true
     }
 }
