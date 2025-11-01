@@ -77,11 +77,11 @@ function renderCategoryChooser(selectedCategory: string) {
                 default: selectedCategory === "languages",
             }),
             new StringSelectMenuOptionBuilder({
-                label: "Schools",
-                value: "schools",
-                description: "Congrats grad!",
-                emoji: "🎓",
-                default: selectedCategory === "schools",
+                label: "Region / City",
+                value: "region",
+                description: "I'll come to your house",
+                emoji: "🏙️",
+                default: selectedCategory === "region",
             }),
         ])
     );
