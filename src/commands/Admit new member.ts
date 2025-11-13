@@ -18,7 +18,7 @@ export const guilds = Object.keys(roleToGiveByGuildId);
 
 export const commandData: CommandData = {
     type: ApplicationCommandType.User,
-    defaultMemberPermissions: PermissionFlagsBits.Administrator,
+    defaultMemberPermissions: PermissionFlagsBits.ManageRoles,
 };
 
 export async function action({ interaction }: CommandArgs) {
