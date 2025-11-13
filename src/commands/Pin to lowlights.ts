@@ -20,7 +20,7 @@ export const guilds = Object.keys(lowlightChannelByGuild);
 
 export const commandData: CommandData = {
     type: ApplicationCommandType.Message,
-    defaultMemberPermissions: PermissionFlagsBits.Administrator,
+    defaultMemberPermissions: PermissionFlagsBits.ManageMessages,
     // TODO: I'm not exactly sure how this was working before because I can't find any docs
     // for "permissions" field. For now, I've set "defaultMemberPermissions" to administrator
     // as a safe alternative.
