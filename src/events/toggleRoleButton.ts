@@ -14,7 +14,7 @@ export async function toggleRoleButtonEvent({
         return;
     }
 
-    const [category, page, roleId] = interaction.customId.split("_");
+    const [, category, page, roleId] = interaction.customId.split("_");
     if (category == null || page == null || roleId == null) {
         console.error("Invalid row selection");
         return;
