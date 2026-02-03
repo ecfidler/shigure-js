@@ -1,4 +1,3 @@
-import { ButtonStyle } from "discord.js";
 import type { CommandArgs } from "../types/CommandArgs";
 import { renderRoleChooser } from "../utilities/roleChooser/renderRoleChooser";
 import { hasRole } from "../utilities/roles/hasRole";
@@ -15,9 +14,15 @@ export async function toggleRoleButtonEvent({
         return;
     }
 
-    const [category, pageNumber, roleId] = interaction.customId.split("_");
-    if (category == null || pageNumber == null || roleId == null) {
+    const [category, page, roleId] = interaction.customId.split("_");
+    if (category == null || page == null || roleId == null) {
         console.error("Invalid row selection");
+        return;
+    }
+
+    const pageNumber = Number(page);
+    if (isNaN(pageNumber)) {
+        console.error("Invalid page number");
         return;
     }
 
@@ -27,13 +32,12 @@ export async function toggleRoleButtonEvent({
     } else {
         await interaction.member.roles.add(roleId);
     }
-    // TODO: How do we know that the button will render correctly?
 
     const roleChooser = await renderRoleChooser(
         client,
         interaction,
         category,
-        Number(pageNumber) // TODO validate this
+        pageNumber
     );
 
     await interaction.update({
