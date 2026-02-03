@@ -39,7 +39,7 @@ export function getPaginatedRoleSelectionMessage(
     }
 
     return {
-        roleRows: getButtonRowsWithPages(sortedRoles, member, page),
+        roleRows: getButtonRowsWithPages(sortedRoles, member, category, page),
         pageButtons: getPageSwitchingRow(category, page, sortedRoles.length),
     };
 }
@@ -54,6 +54,7 @@ function getButtonRowsWithoutPages(
 function getButtonRowsWithPages(
     allRoles: readonly RoleAndEmoji[],
     member: GuildMember,
+    category: string,
     page: number
 ) {
     const rolesOnPage = allRoles.slice(
@@ -61,7 +62,7 @@ function getButtonRowsWithPages(
         (page + 1) * MAX_ROLES_PER_PAGE
     );
 
-    return makeRoleRows(MAX_ROLE_ROWS, rolesOnPage, member);
+    return makeRoleRows(MAX_ROLE_ROWS, rolesOnPage, member, category, page);
 }
 
 function getPageSwitchingRow(category: string, page: number, numRoles: number) {
@@ -86,7 +87,9 @@ function getPageSwitchingRow(category: string, page: number, numRoles: number) {
 function makeRoleRows(
     numRows: number,
     roles: readonly RoleAndEmoji[],
-    member: GuildMember
+    member: GuildMember,
+    category: string,
+    page: number
 ) {
     const rows = [];
     for (let i = 0; i < numRows; i++) {
@@ -97,13 +100,18 @@ function makeRoleRows(
         }
 
         const rolesInRow = roles.slice(rowStartIndex, rowEndIndex);
-        const row = makeRowOfRoles(rolesInRow, member);
+        const row = makeRowOfRoles(rolesInRow, member, category, page);
         rows.push(row);
     }
     return rows;
 }
 
-function makeRowOfRoles(roles: readonly RoleAndEmoji[], member: GuildMember) {
+function makeRowOfRoles(
+    roles: readonly RoleAndEmoji[],
+    member: GuildMember,
+    category: string,
+    page: number
+) {
     const row = new ActionRowBuilder<ButtonBuilder>();
     for (const role of roles) {
         row.addComponents(
@@ -113,7 +121,7 @@ function makeRowOfRoles(roles: readonly RoleAndEmoji[], member: GuildMember) {
                     ? ButtonStyle.Success
                     : ButtonStyle.Secondary,
                 emoji: convertGuildEmojiToButtonEmoji(role.emoji),
-                custom_id: `toggleRoleButton_${role.role.id}`,
+                custom_id: `toggleRoleButton_${category}_${page}_${role.role.id}`,
             })
         );
     }
