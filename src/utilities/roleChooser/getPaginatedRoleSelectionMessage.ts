@@ -34,7 +34,7 @@ export function getPaginatedRoleSelectionMessage(
 
     if (sortedRoles.length <= MAX_ROLES_PER_PAGE) {
         return {
-            roleRows: getButtonRowsWithoutPages(sortedRoles, member),
+            roleRows: getButtonRowsWithoutPages(sortedRoles, member, category),
         };
     }
 
@@ -46,9 +46,10 @@ export function getPaginatedRoleSelectionMessage(
 
 function getButtonRowsWithoutPages(
     roles: readonly RoleAndEmoji[],
-    member: GuildMember
+    member: GuildMember,
+    category: string
 ) {
-    return makeRoleRows(MAX_ROLE_ROWS, roles, member);
+    return makeRoleRows(MAX_ROLE_ROWS, roles, member, category, 0);
 }
 
 function getButtonRowsWithPages(
