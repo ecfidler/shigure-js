@@ -32,6 +32,7 @@ export async function toggleRoleButtonEvent({
     } else {
         await interaction.member.roles.add(roleId);
     }
+    await interaction.member.fetch(true);
 
     const roleChooser = await renderRoleChooser(
         client,
