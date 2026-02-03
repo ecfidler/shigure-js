@@ -1,21 +1,22 @@
-import {
-    ActionRowBuilder,
-    ButtonBuilder,
-    ButtonStyle,
-    ComponentType,
-    type TopLevelComponent,
-} from "discord.js";
-import { roleMenuHeader } from "../commands/roleup";
+import { ButtonStyle } from "discord.js";
 import type { CommandArgs } from "../types/CommandArgs";
+import { renderRoleChooser } from "../utilities/roleChooser/renderRoleChooser";
 import { hasRole } from "../utilities/roles/hasRole";
 
-export async function toggleRoleButtonEvent({ interaction }: CommandArgs) {
+export async function toggleRoleButtonEvent({
+    interaction,
+    client,
+}: CommandArgs) {
+    if (!client.isReady()) {
+        return;
+    }
+
     if (!interaction.isButton()) {
         return;
     }
 
-    const roleId = interaction.customId.split("_")[1];
-    if (roleId == null) {
+    const [category, pageNumber, roleId] = interaction.customId.split("_");
+    if (category == null || pageNumber == null || roleId == null) {
         console.error("Invalid row selection");
         return;
     }
@@ -26,45 +27,16 @@ export async function toggleRoleButtonEvent({ interaction }: CommandArgs) {
     } else {
         await interaction.member.roles.add(roleId);
     }
+    // TODO: How do we know that the button will render correctly?
 
-    const newComponents: (
-        | TopLevelComponent
-        | ActionRowBuilder<ButtonBuilder>
-    )[] = [];
-
-    for (const component of interaction.message.components) {
-        if (component.type !== ComponentType.ActionRow) {
-            newComponents.push(component);
-            continue;
-        }
-
-        const actionRowBuilder = new ActionRowBuilder<ButtonBuilder>();
-        for (const action of component.components) {
-            if (action.type !== ComponentType.Button) {
-                // We drop non-buttons here. There isn't a reasonable way to do this otherwise.
-                continue;
-            }
-            const buttonBuilder = ButtonBuilder.from(action);
-            if (action.customId === interaction.customId) {
-                buttonBuilder.setStyle(toggleButtonStyle(action.style));
-            }
-            actionRowBuilder.addComponents(buttonBuilder);
-        }
-        newComponents.push(actionRowBuilder);
-    }
+    const roleChooser = await renderRoleChooser(
+        client,
+        interaction,
+        category,
+        Number(pageNumber) // TODO validate this
+    );
 
     await interaction.update({
-        embeds: [roleMenuHeader],
-        components: newComponents,
+        components: roleChooser,
     });
-}
-
-function toggleButtonStyle(style: ButtonStyle | undefined) {
-    // Note: we only expect success or secondary.
-    // If we encounter an unexpected value, then set it to secondary.
-
-    if (style === ButtonStyle.Secondary) {
-        return ButtonStyle.Success;
-    }
-    return ButtonStyle.Secondary;
 }
