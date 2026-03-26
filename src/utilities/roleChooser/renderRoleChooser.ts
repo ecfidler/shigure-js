@@ -83,6 +83,13 @@ function renderCategoryChooser(selectedCategory: string) {
                 emoji: "🏙️",
                 default: selectedCategory === "region",
             }),
+            new StringSelectMenuOptionBuilder({
+                label: "Events",
+                value: "events",
+                description: "temporary roles to do stuff together!",
+                emoji: "📺",
+                default: selectedCategory === "events",
+            }),
         ])
     );
 }
