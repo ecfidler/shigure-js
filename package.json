@@ -5,7 +5,9 @@
     "main": "src/index.ts",
     "scripts": {
         "dev": "tsx watch src/index.ts",
-        "start": "tsx src/index.ts"
+        "start": "tsx src/index.ts",
+        "lint": "eslint .",
+        "lint-fix": "eslint --fix ."
     },
     "repository": {
         "type": "git",
@@ -34,7 +36,7 @@
     },
     "devDependencies": {
         "@eslint/js": "^9.26.0",
-        "eslint": "^9.26.0",
+        "eslint": "^9.39.4",
         "eslint-config-prettier": "^8.5.0",
         "prettier": "2.7.1",
         "tsx": "^4.19.4",
