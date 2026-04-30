@@ -1,34 +1,20 @@
 import { ApplicationCommandType } from "discord.js";
-import snoowrap from "snoowrap";
 import { auth } from "../auth.js";
 import type { CommandArgs } from "../types/CommandArgs.js";
 import type { CommandData } from "../types/CommandData.js";
 import { GUILDS } from "../utilities/constants.js";
-
-// Reddit Client
-let redditClient: snoowrap;
-const getRedditClientSingleton = () => {
-    if (redditClient == null) {
-        redditClient = new snoowrap({
-            // NOTE: We have already asserted that these vals exist
-            userAgent: auth.RuserAgent!,
-            clientId: auth.RclientId!,
-            clientSecret: auth.RclientSecret!,
-            username: auth.Rusername!,
-            password: auth.Rpassword!,
-        });
-    }
-
-    return redditClient;
-};
+import {
+    getRandomSubmission,
+    type RedditCreds,
+} from "../utilities/reddit-client.js";
 
 const errorMessage =
     "OOPSIE WOOPSIE!! Uwu We made a fucky wucky!! A wittle fucko boingo! The code monkeys at our headquarters are working VEWY HAWD to fix this!\n_~error message_";
 
-export const guild = GUILDS.WHID;
+export const guilds = [GUILDS.WHID, GUILDS.TEST];
 
 export const commandData: CommandData = {
-    description: "gets a random piece of artwork from r/copypasta.",
+    description: "gets a random work of art from r/copypasta.",
     type: ApplicationCommandType.ChatInput,
 };
 
@@ -37,8 +23,8 @@ export async function action({ interaction }: CommandArgs) {
         return;
     }
 
-    const enablePastaCommand = checkAuthorizationHeadersForReddit(auth);
-    if (!enablePastaCommand) {
+    const creds = getRedditCreds();
+    if (creds == null) {
         console.warn(
             "No reddit API credentials provided. Reddit features will not work"
         );
@@ -47,42 +33,43 @@ export async function action({ interaction }: CommandArgs) {
 
     await interaction.deferReply();
 
-    getRedditClientSingleton()
-        .getRandomSubmission("copypasta")
-        .then(
-            async value => {
-                if (value.selftext) {
-                    if (value.selftext.length < 2000) {
-                        await interaction.editReply(value.selftext);
-                    } else {
-                        const cutoff = 1991 - value.url.length;
-                        await interaction.editReply(
-                            `${value.selftext.substring(0, cutoff)}[...](<${
-                                value.url
-                            }>)`
-                        );
-                    }
-                } else {
-                    console.log(value);
-                    await interaction.editReply(errorMessage);
-                }
-            },
-            async value => {
-                console.error(value);
-                await interaction.editReply(errorMessage);
+    try {
+        const post = await getRandomSubmission("copypasta", creds);
+        if (post.selftext) {
+            if (post.selftext.length < 2000) {
+                await interaction.editReply(post.selftext);
+            } else {
+                const cutoff = 1991 - post.url.length;
+                await interaction.editReply(
+                    `${post.selftext.substring(0, cutoff)}[...](<${post.url}>)`
+                );
             }
-        )
-        .catch(err => {
-            console.log(err);
-        });
+        } else {
+            console.log(post);
+            await interaction.editReply(errorMessage);
+        }
+    } catch (err) {
+        console.error(err);
+        await interaction.editReply(errorMessage);
+    }
 }
 
-function checkAuthorizationHeadersForReddit(authObject: typeof auth) {
-    return (
-        authObject.RuserAgent != null &&
-        authObject.RclientId != null &&
-        authObject.RclientSecret != null &&
-        authObject.Rusername != null &&
-        authObject.Rpassword != null
-    );
+function getRedditCreds(): RedditCreds | null {
+    const { RuserAgent, RclientId, RclientSecret, Rusername, Rpassword } = auth;
+    if (
+        RuserAgent == null ||
+        RclientId == null ||
+        RclientSecret == null ||
+        Rusername == null ||
+        Rpassword == null
+    ) {
+        return null;
+    }
+    return {
+        userAgent: RuserAgent,
+        clientId: RclientId,
+        clientSecret: RclientSecret,
+        username: Rusername,
+        password: Rpassword,
+    };
 }

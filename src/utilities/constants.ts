@@ -21,6 +21,9 @@ export const CHANNELS = {
     FINDER: "592225004410896405", // sauce finder in sauce emporium
 
     LOW_TEST: "674689826976694276", // spam in ben testing
+
+    DO: "200852342667476992", // do
+    DO_TEST: "543283759928311819", // general in ethan testing
 };
 
 export const ROLES = {
@@ -32,6 +35,7 @@ export const ROLES = {
     BIRTHDAY: "550726235559297025",
 
     MINOR_TEST: "1386137435192426616", // minor role in ben testing
+    BIRTHDAY_TEST: "1499401768466124942", // birthday role in TEST
 };
 
 export const EMOJIS = {

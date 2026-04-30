@@ -8,7 +8,7 @@ import type { CommandArgs } from "../types/CommandArgs";
 import type { CommandData } from "../types/CommandData";
 import { GUILDS } from "../utilities/constants";
 
-export const guild = GUILDS.WHID;
+export const guilds = [GUILDS.WHID];
 
 export const commandData: CommandData = {
     type: ApplicationCommandType.ChatInput,

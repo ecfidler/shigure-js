@@ -4,7 +4,7 @@ import type { CommandData } from "../types/CommandData";
 import { GUILDS } from "../utilities/constants";
 import { renderRoleChooser } from "../utilities/roleChooser/renderRoleChooser";
 
-export const guild = GUILDS.GLOBAL;
+export const guilds = [GUILDS.GLOBAL];
 
 export const commandData: CommandData = {
     description:

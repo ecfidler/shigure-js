@@ -27,7 +27,7 @@ const SAUCE_NAO_AUTHOR = {
 // Attachments
 const icon = new AttachmentBuilder("./assets/images/icon.png");
 
-export const guild = GUILDS.GLOBAL;
+export const guilds = [GUILDS.GLOBAL];
 
 export const commandData: CommandData = {
     type: ApplicationCommandType.Message,

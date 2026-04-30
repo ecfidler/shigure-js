@@ -6,7 +6,7 @@ import {
 import type { CommandArgs } from "../types/CommandArgs";
 import type { CommandData } from "../types/CommandData";
 
-export const guild = "173840048343482368";
+export const guilds = ["173840048343482368"];
 
 export const commandData: CommandData = {
     description: "call and response",

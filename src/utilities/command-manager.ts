@@ -2,10 +2,10 @@ import type { ChatInputApplicationCommandData, Client } from "discord.js";
 import fs from "fs";
 import path from "path";
 import type { CommandArgs } from "../types/CommandArgs";
+import { GUILDS } from "./constants";
 
 interface CommandModule {
-    readonly guild?: string;
-    readonly guilds?: string;
+    readonly guilds?: readonly string[];
     readonly action: (args: CommandArgs) => Promise<void>;
     readonly name: string;
     readonly commandData: ChatInputApplicationCommandData;
@@ -32,21 +32,17 @@ export async function loadCommands(client: Client<true>) {
             commandModule.commandData.name = commandName;
         }
 
-        if (commandModule.guild === "global") {
-            globalCommands.push(commandModule.commandData);
-        } else if (commandModule.guild != null) {
-            pushOrCreate(
-                guildCommandDatasByGuildId,
-                commandModule.guild,
-                commandModule.commandData
-            );
-        } else if (commandModule.guilds != null) {
-            for (const guild of commandModule.guilds) {
-                pushOrCreate(
-                    guildCommandDatasByGuildId,
-                    guild,
-                    commandModule.commandData
-                );
+        if (commandModule.guilds != null) {
+            for (const guildId of commandModule.guilds) {
+                if (guildId === GUILDS.GLOBAL) {
+                    globalCommands.push(commandModule.commandData);
+                } else {
+                    pushOrCreate(
+                        guildCommandDatasByGuildId,
+                        guildId,
+                        commandModule.commandData
+                    );
+                }
             }
         }
 
