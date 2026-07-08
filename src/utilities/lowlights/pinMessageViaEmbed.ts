@@ -22,7 +22,7 @@ export async function pinMessageViaEmbed(
                     iconURL: author.user.displayAvatarURL(),
                     url: message.url,
                 })
-                .setDescription(message.content)
+                .setDescription(message.content || null)
                 .setImage(message.attachments.last()?.url ?? null)
                 .setTimestamp(message.createdAt)
                 .setFooter({
