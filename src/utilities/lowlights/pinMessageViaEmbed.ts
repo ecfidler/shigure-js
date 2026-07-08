@@ -12,6 +12,15 @@ export async function pinMessageViaEmbed(
     pinner: User,
     lowlightsChannel: SendableChannels
 ) {
+    const imageAttachment =
+        message.attachments.find((a) =>
+            a.contentType?.startsWith("image/")
+        ) ?? null;
+
+    const videoAttachments = message.attachments.filter((a) =>
+        a.contentType?.startsWith("video/")
+    );
+
     await lowlightsChannel.send({
         embeds: [
             new EmbedBuilder()
@@ -23,7 +32,7 @@ export async function pinMessageViaEmbed(
                     url: message.url,
                 })
                 .setDescription(message.content || null)
-                .setImage(message.attachments.last()?.url ?? null)
+                .setImage(imageAttachment?.url ?? null)
                 .setTimestamp(message.createdAt)
                 .setFooter({
                     text: `📌 #${
@@ -32,4 +41,8 @@ export async function pinMessageViaEmbed(
                 }),
         ],
     });
+
+    for (const video of videoAttachments.values()) {
+        await lowlightsChannel.send(video.url);
+    }
 }
