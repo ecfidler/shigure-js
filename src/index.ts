@@ -3,13 +3,18 @@ import { auth } from "./auth";
 import { changeRolesCategoryEvent } from "./events/changeRolesCategory";
 import { changeRolesPageEvent } from "./events/changeRolesPage";
 import { joinSauceEmporiumEvent } from "./events/joinSauceEmporium";
+import { removeBirthdayOnEveryoneEvent } from "./events/removeBirthdayOnEveryone";
 import { toggleRoleButtonEvent } from "./events/toggleRoleButton";
 import { commandModuleByName, loadCommands } from "./utilities/command-manager";
 import { GUILDS } from "./utilities/constants";
 import { CHANGE_ROLES_CATEGORY_EVENT_ID } from "./utilities/roleChooser/constants";
 
 const client = new Client({
-    intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers],
+    intents: [
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildMembers,
+        GatewayIntentBits.GuildMessages,
+    ],
 });
 
 client.once("clientReady", readyClient => {
@@ -77,6 +82,12 @@ client.on("guildMemberAdd", member => {
     if (member.guild.id === GUILDS.YONI) {
         joinSauceEmporiumEvent(member);
     }
+});
+
+client.on("messageCreate", message => {
+    removeBirthdayOnEveryoneEvent(message).catch(error => {
+        console.error("Error in removeBirthdayOnEveryoneEvent:", error);
+    });
 });
 
 client.login(auth.DISCORD_TOKEN);
