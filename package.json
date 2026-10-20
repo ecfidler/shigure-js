@@ -6,7 +6,8 @@
     "scripts": {
         "dev": "tsx watch src/index.ts",
         "start": "tsx src/index.ts",
-        "lint": "eslint .",
+        "typecheck": "tsc --noEmit",
+        "lint": "npm run typecheck && eslint .",
         "lint-fix": "eslint --fix ."
     },
     "repository": {

@@ -8,7 +8,8 @@ this is the project for "Shigure", a discord bot written with Node and discord.j
 
 ```bash
 npm run dev  # Run the project
-npm run lint # Run ESLint
+npm run typecheck # Run the TypeScript type checker (tsc --noEmit)
+npm run lint      # Run the type checker, then ESLint
 ```
 
 ## Comments
