@@ -7,7 +7,7 @@ const birthdayRoleByGuildId: Record<string, string> = {
 };
 
 export async function removeBirthdayOnEveryoneEvent(message: Message) {
-    if (!message.inCachedGuild()) return;
+    if (!message.inGuild()) return;
     if (!message.mentions.everyone) return;
 
     const birthdayRoleId = birthdayRoleByGuildId[message.guild.id];
